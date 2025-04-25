@@ -1,64 +1,95 @@
-# Terraform Provider Scaffolding (Terraform Plugin Framework)
+# Terraform Provider Porkbun
 
-_This template repository is built on the [Terraform Plugin Framework](https://github.com/hashicorp/terraform-plugin-framework). The template repository built on the [Terraform Plugin SDK](https://github.com/hashicorp/terraform-plugin-sdk) can be found at [terraform-provider-scaffolding](https://github.com/hashicorp/terraform-provider-scaffolding). See [Which SDK Should I Use?](https://developer.hashicorp.com/terraform/plugin/framework-benefits) in the Terraform documentation for additional information._
+This Terraform provider lets you automate the management of Porkbun domains, DNS records, and other related resources.
 
-This repository is a *template* for a [Terraform](https://www.terraform.io) provider. It is intended as a starting point for creating Terraform providers, containing:
+## Contributing
 
-- A resource and a data source (`internal/provider/`),
-- Examples (`examples/`) and generated documentation (`docs/`),
-- Miscellaneous meta files.
+Contributions are welcome! If you have suggestions or improvements, please open an issue or a pull request.
 
-These files contain boilerplate code that you will need to edit to create your own Terraform provider. Tutorials for creating Terraform providers can be found on the [HashiCorp Developer](https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework) platform. _Terraform Plugin Framework specific guides are titled accordingly._
-
-Please see the [GitHub template repository documentation](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template) for how to create a new repository from this template on GitHub.
-
-Once you've written your provider, you'll want to [publish it on the Terraform Registry](https://developer.hashicorp.com/terraform/registry/providers/publishing) so that others can use it.
-
-## Requirements
+### Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.23
 
-## Building The Provider
+### Building the Provider
 
-1. Clone the repository
-1. Enter the repository directory
-1. Build the provider using the Go `install` command:
+1. Clone the repository.
+2. Navigate into the repository directory.
+3. Build the provider using the Go `install` command:
 
 ```shell
 go install
 ```
 
-## Adding Dependencies
+### Acceptance Testing
 
-This provider uses [Go modules](https://github.com/golang/go/wiki/Modules).
-Please see the Go documentation for the most up to date information about using Go modules.
+To run acceptance tests, you need:
 
-To add a new dependency `github.com/author/dependency` to your Terraform provider:
+- A valid Porkbun API key and secret
+- A registered domain for testing
 
-```shell
-go get github.com/author/dependency
-go mod tidy
+Set the required environment variables:
+
+```bash
+export PORKBUN_API_KEY="your_api_key"
+export PORKBUN_SECRET_API_KEY="your_secret_api_key"
+export PORKBUN_ACCTEST_DOMAIN="example.com"
 ```
 
-Then commit the changes to `go.mod` and `go.sum`.
+Run the tests with:
 
-## Using the provider
-
-Fill this in for each provider
-
-## Developing the Provider
-
-If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (see [Requirements](#requirements) above).
-
-To compile the provider, run `go install`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
-
-To generate or update documentation, run `make generate`.
-
-In order to run the full suite of Acceptance tests, run `make testacc`.
-
-*Note:* Acceptance tests create real resources, and often cost money to run.
-
-```shell
-make testacc
+```bash
+make acctest
 ```
+
+> ⚠️ During testing, the provider will create and destroy resources in the domain specified by `PORKBUN_ACCTEST_DOMAIN`.
+> Use a test domain or a domain you can safely modify.
+
+## Using the Provider Locally
+
+To test the provider locally, configure Terraform to use your local build by adding the following to your
+`~/.terraformrc` file.
+Replace `<GOPATH>` with your actual Go path, which you can find by running `go env GOPATH`:
+
+```hcl
+provider_installation {
+  dev_overrides {
+    "registry.terraform.io/marcfrederick/porkbun" = "<GOPATH>/bin"
+  }
+  direct {}
+}
+```
+
+Then, create a new Terraform configuration file (e.g., `main.tf`) with the following:
+
+```hcl
+terraform {
+  required_providers {
+    porkbun = {
+      source  = "marcfrederick/porkbun"
+      version = ">= 0.1.0"
+    }
+  }
+}
+
+provider "porkbun" {}
+```
+
+## Related Projects
+
+Other existing Terraform providers for Porkbun support different subsets of the API. These providers rely on less
+feature-rich or custom API clients, making them harder to extend compared to implementing a new provider.
+
+- [cullenmcdermott/porkbun](https://registry.terraform.io/providers/cullenmcdermott/porkbun)
+  - `porkbun_dns_record` (Resource)
+- [kyswtn/porkbun](https://registry.terraform.io/providers/kyswtn/porkbun)
+  - `porkbun_dns_record` (Resource)
+  - `porkbun_nameservers` (Resource)
+  - `porkbun_nameservers` (Data Source)
+
+## Acknowledgements
+
+* [tuzzmaniandevil](github.com/tuzzmaniandevil) for the [Porkbun API client](github.com/tuzzmaniandevil/porkbun-go).
+* [HashiCorp](https://www.hashicorp.com) for
+  the [Terraform Plugin Framework](github.com/hashicorp/terraform-plugin-framework)
+  and [Terraform Provider Development Guide](https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-provider).

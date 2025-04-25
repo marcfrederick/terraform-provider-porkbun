@@ -1,0 +1,22 @@
+repos:
+  - repo: local
+    hooks:
+      - id: go-test
+        name: go test
+        entry: go test -v ./...
+        pass_filenames: false
+        language: system
+      - id: generate-docs
+        name: Generate Docs
+        entry: cd docs && go generate ./...
+        pass_filenames: false
+        language: system
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v2.1.5
+    hooks:
+      - id: golangci-lint
+      - id: golangci-lint-fmt
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.3
+    hooks:
+      - id: gitleaks
