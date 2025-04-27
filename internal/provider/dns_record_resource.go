@@ -154,6 +154,12 @@ func (r *DNSRecordResource) Read(ctx context.Context, req resource.ReadRequest, 
 		resp.Diagnostics.AddError("Error Reading DNS Record", err.Error())
 		return
 	}
+
+	if len(apiResp.Records) == 0 {
+		resp.Diagnostics.AddError("DNS Record Not Found", fmt.Sprintf("No DNS record found for ID %d in domain %s", data.ID.ValueInt64(), data.Domain.ValueString()))
+		return
+	}
+
 	record := apiResp.Records[0]
 
 	subdomain, err := r.subdomainFromDomain(record.Name)
@@ -215,14 +221,27 @@ func (r *DNSRecordResource) Delete(ctx context.Context, req resource.DeleteReque
 func (r *DNSRecordResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	idParts := strings.SplitN(req.ID, ":", 2)
 
-	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
-		resp.Diagnostics.AddError("Invalid Import ID", "Expected format: <domain>:<forward_id>")
+	if len(idParts) != 2 {
+		resp.Diagnostics.AddError("Invalid Import ID", "Expected format: <domain>:<record_id>")
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &URLForwardResourceModel{
-		ID:     types.StringValue(idParts[1]),
-		Domain: types.StringValue(idParts[0]),
+	domain := strings.TrimSpace(idParts[0])
+	recordID := strings.TrimSpace(idParts[1])
+	if domain == "" || recordID == "" {
+		resp.Diagnostics.AddError("Invalid Import ID", "Domain and record ID cannot be empty. Expected format: <domain>:<record_id>")
+		return
+	}
+
+	id, err := strconv.ParseInt(recordID, 10, 64)
+	if err != nil {
+		resp.Diagnostics.AddError("Invalid Import ID", fmt.Sprintf("Failed to parse record ID as integer. Expected format: <domain>:<record_id>. Error: %s", err.Error()))
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &DNSRecordResourceModel{
+		Domain: types.StringValue(domain),
+		ID:     types.Int64Value(id),
 	})...)
 }
 
