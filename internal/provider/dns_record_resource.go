@@ -249,12 +249,13 @@ func (r *DNSRecordResource) ImportState(ctx context.Context, req resource.Import
 func (r *DNSRecordResource) subdomainFromDomain(name string) (string, error) {
 	parts := strings.Split(name, ".")
 	if len(parts) < 2 {
-		return "", fmt.Errorf("invalid domain name: %s", name)
+		return "", fmt.Errorf("invalid domain name: %q", name)
 	}
 
 	subdomain := strings.Join(parts[:len(parts)-2], ".")
 	if subdomain == "" {
-		return parts[0], nil
+		return "", nil
 	}
+
 	return subdomain, nil
 }

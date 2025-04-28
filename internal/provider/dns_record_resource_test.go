@@ -112,3 +112,33 @@ resource "porkbun_dns_record" "test" {
 }
 `, testAccDomain(), subdomain, recordType, content, ttl, prio)
 }
+
+func TestDNSRecordResource_subdomainFromDomain(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{"simple", args{"example.com"}, "", false},
+		{"subdomain", args{"foo.example.com"}, "foo", false},
+		{"multiple subdomains", args{"foo.bar.example.com"}, "foo.bar", false},
+		{"invalid domain", args{"example"}, "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &DNSRecordResource{}
+			got, err := r.subdomainFromDomain(tt.args.name)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("subdomainFromDomain() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("subdomainFromDomain() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
