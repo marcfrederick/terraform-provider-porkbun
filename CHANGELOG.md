@@ -1,4 +1,10 @@
-## 1.0.2 (unreleased)
+## 1.1.1 (unreleased)
+
+## 1.1.0 (2025-04-28)
+
+FEATURES:
+
+- provider: Add `max_retries` config option for retrying requests. This should help with rate limiting issues.
 
 ## 1.0.1 (2025-04-27)
 

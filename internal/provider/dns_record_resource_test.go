@@ -12,19 +12,6 @@ import (
 )
 
 func TestAccDNSRecordResource(t *testing.T) {
-	/**
-	type DNSRecordResourceModel struct {
-		ID        types.Int64  `tfsdk:"id"`
-		Domain    types.String `tfsdk:"domain"`
-		Subdomain types.String `tfsdk:"subdomain"`
-		Type      types.String `tfsdk:"type"`
-		Content   types.String `tfsdk:"content"`
-		TTL       types.Int64  `tfsdk:"ttl"`
-		Prio      types.Int64  `tfsdk:"prio"`
-		Notes     types.String `tfsdk:"notes"`
-	}
-	*/
-
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
