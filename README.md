@@ -49,12 +49,12 @@ make acctest
 
 To test the provider locally, configure Terraform to use your local build by adding the following to your
 `~/.terraformrc` file.
-Replace `<GOPATH>` with your actual Go path, which you can find by running `go env GOPATH`:
+Replace `<GOBIN>` with the actual path, which you can find by running `go env GOBIN`:
 
 ```hcl
 provider_installation {
   dev_overrides {
-    "registry.terraform.io/marcfrederick/porkbun" = "<GOPATH>/bin"
+    "registry.terraform.io/marcfrederick/porkbun" = "<GOBIN>"
   }
   direct {}
 }
