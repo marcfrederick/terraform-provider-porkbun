@@ -149,18 +149,11 @@ func (r *DNSRecordResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	apiResp, err := r.client.Dns.GetRecords(ctx, data.Domain.ValueString(), data.ID.ValueInt64Pointer())
+	record, err := r.getDNSRecord(ctx, data.Domain.ValueString(), data.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError("Error Reading DNS Record", err.Error())
+		resp.Diagnostics.AddError("Error Fetching DNS Record", err.Error())
 		return
 	}
-
-	if len(apiResp.Records) == 0 {
-		resp.Diagnostics.AddError("DNS Record Not Found", fmt.Sprintf("No DNS record found for ID %d in domain %s", data.ID.ValueInt64(), data.Domain.ValueString()))
-		return
-	}
-
-	record := apiResp.Records[0]
 
 	subdomain, err := r.subdomainFromDomain(record.Name)
 	if err != nil {
@@ -243,6 +236,22 @@ func (r *DNSRecordResource) ImportState(ctx context.Context, req resource.Import
 		Domain: types.StringValue(domain),
 		ID:     types.Int64Value(id),
 	})...)
+}
+
+// getDNSRecord fetches the DNS record from Porkbun using the domain and record ID.
+func (r *DNSRecordResource) getDNSRecord(ctx context.Context, domain string, id int64) (*porkbun.DnsRecord, error) {
+	apiResp, err := r.client.Dns.GetRecords(ctx, domain, &id)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching DNS record: %w", err)
+	}
+
+	if len(apiResp.Records) == 0 {
+		return nil, fmt.Errorf("no DNS records found for ID %q in domain %q", id, domain)
+	} else if len(apiResp.Records) > 1 {
+		return nil, fmt.Errorf("multiple DNS records found for ID %q in domain %q", id, domain)
+	}
+
+	return &apiResp.Records[0], nil
 }
 
 // subdomainFromDomain extracts the subdomain from the full domain name.
