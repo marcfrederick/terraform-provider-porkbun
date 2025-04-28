@@ -1,5 +1,10 @@
 ## 1.1.1 (unreleased)
 
+BUG FIXES:
+
+- resource/porkbun_dns_record: Fix an issue where the `subdomain` field was sometimes set incorrectly when reading
+  records.
+
 ## 1.1.0 (2025-04-28)
 
 FEATURES:
