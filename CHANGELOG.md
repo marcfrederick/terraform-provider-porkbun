@@ -1,4 +1,6 @@
-## 1.1.1 (unreleased)
+## 1.1.2 (unreleased)
+
+## 1.1.1 (2025-04-29)
 
 BUG FIXES:
 
