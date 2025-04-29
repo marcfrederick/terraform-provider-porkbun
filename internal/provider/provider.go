@@ -3,9 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/ephemeral"
@@ -17,8 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/tuzzmaniandevil/porkbun-go"
-
-	"github.com/marcfrederick/terraform-provider-porkbun/internal/util"
 )
 
 const defaultMaxRetries = 3
@@ -118,10 +116,7 @@ func (p *PorkbunProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	var httpClient porkbun.HTTPClient = &http.Client{
-		Transport: util.NewRetryTransport(http.DefaultTransport, maxRetries),
-	}
-
+	httpClient := p.newRetryableHttpClient(maxRetries)
 	client := porkbun.NewClient(&porkbun.Options{
 		ApiKey:       apiKey,
 		SecretApiKey: secretAPIKey,
@@ -224,4 +219,11 @@ func ConfigureDataSource(req datasource.ConfigureRequest, resp *datasource.Confi
 	}
 
 	return client
+}
+
+// newRetryableHttpClient creates a porkbun.HTTPClient with retry capabilities.
+func (p *PorkbunProvider) newRetryableHttpClient(maxRetries int) porkbun.HTTPClient {
+	retryableHttpClient := retryablehttp.NewClient()
+	retryableHttpClient.RetryMax = maxRetries
+	return retryableHttpClient.StandardClient()
 }
