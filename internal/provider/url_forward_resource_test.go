@@ -64,6 +64,13 @@ func TestAccURLForwardResource(t *testing.T) {
 					),
 				},
 			},
+			// ImportState testing
+			{
+				ResourceName:        "porkbun_url_forward.test",
+				ImportStateIdPrefix: fmt.Sprintf("%s:", testAccDomain()),
+				ImportState:         true,
+				// ImportStateVerify:   true,
+			},
 			// Update and Read testing
 			{
 				Config: testAccURLForwardResourceConfig(updatedSubdomain, updatedLocation, "permanent", false, true),

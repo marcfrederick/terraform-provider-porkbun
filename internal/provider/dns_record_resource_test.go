@@ -68,13 +68,12 @@ func TestAccDNSRecordResource(t *testing.T) {
 				},
 			},
 			// ImportState testing
-			// FIXME: This depends on a fixed ID
-			//{
-			//	ResourceName:      "porkbun_dns_record.test",
-			//	ImportStateId:     fmt.Sprintf("%s:12345", testAccDomain()),
-			//	ImportState:       true,
-			//	ImportStateVerify: true,
-			//},
+			{
+				ResourceName:        "porkbun_dns_record.test",
+				ImportStateIdPrefix: fmt.Sprintf("%s:", testAccDomain()),
+				ImportState:         true,
+				ImportStateVerify:   true,
+			},
 			// Update and Read testing
 			{
 				Config: testAccDNSRecordResourceConfig("acctest", "updated content", porkbun.TXT, 3601, 10),
