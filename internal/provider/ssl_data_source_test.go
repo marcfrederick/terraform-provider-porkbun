@@ -11,15 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
-/**
-type SSLDataSourceModel struct {
-	Domain           types.String `tfsdk:"domain"`
-	CertificateChain types.String `tfsdk:"certificate_chain"`
-	PrivateKey       types.String `tfsdk:"private_key"`
-	PublicKey        types.String `tfsdk:"public_key"`
-}
-*/
-
 func TestAccSSLDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },

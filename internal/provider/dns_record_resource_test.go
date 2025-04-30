@@ -18,7 +18,7 @@ func TestAccDNSRecordResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccExampleResourceConfig("acctest", "content", porkbun.TXT, 3600, 0),
+				Config: testAccDNSRecordResourceConfig("acctest", "content", porkbun.TXT, 3600, 0),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"porkbun_dns_record.test",
@@ -77,7 +77,7 @@ func TestAccDNSRecordResource(t *testing.T) {
 			//},
 			// Update and Read testing
 			{
-				Config: testAccExampleResourceConfig("acctest", "updated content", porkbun.TXT, 3601, 10),
+				Config: testAccDNSRecordResourceConfig("acctest", "updated content", porkbun.TXT, 3601, 10),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"porkbun_dns_record.test",
@@ -100,7 +100,7 @@ func TestAccDNSRecordResource(t *testing.T) {
 	})
 }
 
-func testAccExampleResourceConfig(subdomain, content string, recordType porkbun.DnsRecordType, ttl, prio int) string {
+func testAccDNSRecordResourceConfig(subdomain, content string, recordType porkbun.DnsRecordType, ttl, prio int) string {
 	return fmt.Sprintf(`
 resource "porkbun_dns_record" "test" {
   domain    = %[1]q
