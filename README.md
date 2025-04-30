@@ -83,8 +83,8 @@ provider "porkbun" {}
 
 ## Related Projects
 
-Other existing Terraform providers for Porkbun support different subsets of the API. These providers rely on less
-feature-rich or custom API clients, making them harder to extend compared to implementing a new provider.
+Other existing Terraform providers for Porkbun support different subsets of the API.
+Here are some of them:
 
 - [cullenmcdermott/porkbun](https://registry.terraform.io/providers/cullenmcdermott/porkbun)
   - `porkbun_dns_record` (Resource)
@@ -92,10 +92,19 @@ feature-rich or custom API clients, making them harder to extend compared to imp
   - `porkbun_dns_record` (Resource)
   - `porkbun_nameservers` (Resource)
   - `porkbun_nameservers` (Data Source)
+- [developing-today-forks/porkbun](https://registry.terraform.io/providers/developing-today-forks/porkbun)
+  - `porkbun_dns_record` (Resource)
+- [jianyuan/porkbun](https://registry.terraform.io/providers/jianyuan/porkbun)
+  - `porkbun_dns_record` (Resource)
+  - `porkbun_domain_nameservers` (Resource)
+  - `porkbun_dns_record` (Data Source)
+  - `porkbun_dns_records` (Data Source)
+  - `porkbun_domain_nameservers` (Data Source)
+  - `porkbun_domains` (Data Source)
 
 ## Acknowledgements
 
-* [tuzzmaniandevil](github.com/tuzzmaniandevil) for the [Porkbun API client](github.com/tuzzmaniandevil/porkbun-go).
-* [HashiCorp](https://www.hashicorp.com) for
+- [tuzzmaniandevil](github.com/tuzzmaniandevil) for the [Porkbun API client](github.com/tuzzmaniandevil/porkbun-go).
+- [HashiCorp](https://www.hashicorp.com) for
   the [Terraform Plugin Framework](github.com/hashicorp/terraform-plugin-framework)
   and [Terraform Provider Development Guide](https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-provider).
