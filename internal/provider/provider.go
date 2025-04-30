@@ -143,6 +143,7 @@ func (p *PorkbunProvider) EphemeralResources(ctx context.Context) []func() ephem
 func (p *PorkbunProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewDomainDataSource,
+		NewDomainsDataSource,
 		NewNameserversDataSource,
 		NewSSLDataSource,
 	}

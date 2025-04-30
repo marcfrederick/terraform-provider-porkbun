@@ -13,6 +13,15 @@ import (
 	"github.com/tuzzmaniandevil/porkbun-go"
 )
 
+// listDomainsBatchSize defines the batch size for listing domains.
+//
+// This is used to paginate through the list of domains when retrieving them
+// from the API. Porkbun returns a maximum of 1000 domains per request, so we
+// set this constant to 1000 to match that limit.
+//
+// https://porkbun.com/api/json/v3/documentation#Domain%20List%20All
+const listDomainsBatchSize = 1000
+
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &DomainDataSource{}
 
@@ -50,7 +59,7 @@ func (d *DomainDataSource) Metadata(ctx context.Context, req datasource.Metadata
 
 func (d *DomainDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Retrieve detailed information about a domain registered with Porkbun",
+		MarkdownDescription: "Retrieve information about a specific domain.",
 		Attributes: map[string]schema.Attribute{
 			"domain": schema.StringAttribute{
 				MarkdownDescription: "The domain name to retrieve information for. Must be a domain registered with or managed through Porkbun.",
@@ -114,15 +123,13 @@ func (d *DomainDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	data.WhoisPrivacy = types.BoolValue(bool(domain.WhoisPrivacy))
 	data.AutoRenew = types.BoolValue(bool(domain.AutoRenew))
 	data.NotLocal = types.BoolValue(bool(domain.NotLocal))
-	data.Labels = d.convertLabels(domain.Labels)
+	data.Labels = convertDomainLabelsToList(domain.Labels)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 // findDomain retrieves the domain information from the Porkbun API.
 func (d *DomainDataSource) findDomain(ctx context.Context, domainName string) (*porkbun.Domain, error) {
-	const batchSize = 1000
-
 	start := 0
 	for {
 		opts := porkbun.DomainListOptions{
@@ -141,18 +148,18 @@ func (d *DomainDataSource) findDomain(ctx context.Context, domainName string) (*
 			}
 		}
 
-		if len(domainResp.Domains) < batchSize {
+		if len(domainResp.Domains) < listDomainsBatchSize {
 			break
 		}
 
-		start += batchSize
+		start += listDomainsBatchSize
 	}
 
 	return nil, fmt.Errorf("domain %s not found", domainName)
 }
 
-// convertLabels converts a slice of porkbun.Label to a types.List of objects.
-func (d *DomainDataSource) convertLabels(labels []porkbun.Label) types.List {
+// convertDomainLabelsToList converts a slice of porkbun.Label to a types.List of objects.
+func convertDomainLabelsToList(labels []porkbun.Label) types.List {
 	result := make([]attr.Value, len(labels))
 
 	for i, label := range labels {

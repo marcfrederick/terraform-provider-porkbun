@@ -3,12 +3,12 @@
 page_title: "porkbun_domain Data Source - porkbun"
 subcategory: ""
 description: |-
-  Retrieve detailed information about a domain registered with Porkbun
+  Retrieve information about a specific domain.
 ---
 
 # porkbun_domain (Data Source)
 
-Retrieve detailed information about a domain registered with Porkbun
+Retrieve information about a specific domain.
 
 ## Example Usage
 

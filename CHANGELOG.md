@@ -1,4 +1,8 @@
-## 1.1.2 (unreleased)
+## 1.2.0 (unreleased)
+
+FEATURES:
+
+- **New Data Source:** `porkbun_domains`
 
 ## 1.1.1 (2025-04-29)
 
