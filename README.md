@@ -1,5 +1,11 @@
 # Terraform Provider Porkbun
 
+[![License](https://img.shields.io/github/license/marcfrederick/terraform-provider-porkbun)](https://github.com/marcfrederick/terraform-provider-porkbun/blob/main/LICENSE)
+[![Tests](https://github.com/marcfrederick/terraform-provider-porkbun/actions/workflows/test.yml/badge.svg)](https://github.com/marcfrederick/terraform-provider-porkbun/actions/workflows/test.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/marcfrederick/terraform-provider-porkbun)](https://goreportcard.com/report/github.com/marcfrederick/terraform-provider-porkbun)
+[![Latest Release](https://img.shields.io/github/v/release/marcfrederick/terraform-provider-porkbun?include_prereleases)](https://github.com/marcfrederick/terraform-provider-porkbun/releases)
+[![Terraform Downloads](https://img.shields.io/terraform/provider/dy/262854)](https://registry.terraform.io/providers/marcfrederick/porkbun/latest)
+
 This Terraform provider lets you automate the management of Porkbun domains, DNS records, and other related resources.
 
 ## Contributing
