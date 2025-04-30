@@ -52,9 +52,9 @@ jobs:
           git diff --compact-summary --exit-code || \
             (echo; echo "Unexpected difference in directories after code generation. Run 'make generate' command and commit."; exit 1)
 
-  # Run acceptance tests in a matrix with Terraform CLI versions
+    # Run acceptance tests in a matrix with Terraform and OpenTofu CLI versions
   test:
-    name: Terraform Provider Acceptance Tests
+    name: Provider Acceptance Tests
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -62,25 +62,45 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
-        terraform:
-          - '1.9.*'
-          - '1.10.*'
-          - '1.11.*'
+        include:
+          - engine: terraform
+            version: '1.10.*'
+          - engine: terraform
+            version: '1.11.*'
+          - engine: opentofu
+            version: '1.8.*'
+          - engine: opentofu
+            version: '1.9.*'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
         with:
           go-version-file: 'go.mod'
           cache: true
-      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+      - name: Setup Terraform
+        if: matrix.engine == 'terraform'
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
         with:
-          terraform_version: ${{ matrix.terraform }}
+          terraform_version: ${{ matrix.version }}
           terraform_wrapper: false
+      - name: Setup OpenTofu
+        if: matrix.engine == 'opentofu'
+        uses: opentofu/setup-opentofu@592200bd4b9bbf4772ace78f887668b1aee8f716 # v1.0.5
+        with:
+          tofu_version: ${{ matrix.version }}
+          tofu_wrapper: false
       - run: go mod download
-      - env:
+      - name: Run tests
+        env:
           TF_ACC: "1"
           PORKBUN_API_KEY: ${{ secrets.PORKBUN_API_KEY }}
           PORKBUN_SECRET_API_KEY: ${{ secrets.PORKBUN_SECRET_API_KEY }}
           PORKBUN_ACCTEST_DOMAIN: ${{ secrets.PORKBUN_ACCTEST_DOMAIN }}
-        run: go test -v -cover ./internal/provider/
+        run: |
+          if [[ "${{ matrix.engine }}" == "opentofu" ]]; then
+            export TF_ACC_TERRAFORM_PATH="$(command -v tofu)"
+            export TF_ACC_PROVIDER_NAMESPACE="hashicorp"
+            export TF_ACC_PROVIDER_HOST="registry.opentofu.org"
+          fi
+          go test -v -cover ./internal/provider/
         timeout-minutes: 10
