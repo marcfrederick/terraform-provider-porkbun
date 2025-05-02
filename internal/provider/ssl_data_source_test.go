@@ -29,6 +29,8 @@ func TestAccSSLDataSource(t *testing.T) {
 						tfjsonpath.New("certificate_chain"),
 						knownvalue.StringRegexp(regexp.MustCompile(`\s*-+BEGIN CERTIFICATE-+.+`)),
 					),
+					// DANGER: Do not change this to ExpectKnownValue, as it
+					//   may print the private key if the test fails.
 					statecheck.ExpectSensitiveValue(
 						"data.porkbun_ssl.test",
 						tfjsonpath.New("private_key"),

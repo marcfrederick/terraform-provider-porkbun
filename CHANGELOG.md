@@ -3,6 +3,7 @@
 FEATURES:
 
 - **New Data Source:** `porkbun_domains`
+- **New Ephemeral Resource:** `porkbun_ssl`
 
 ## 1.1.1 (2025-04-29)
 

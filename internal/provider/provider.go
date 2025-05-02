@@ -124,8 +124,9 @@ func (p *PorkbunProvider) Configure(ctx context.Context, req provider.ConfigureR
 		HttpClient:   &httpClient,
 	})
 
-	resp.DataSourceData = client
 	resp.ResourceData = client
+	resp.EphemeralResourceData = client
+	resp.DataSourceData = client
 }
 
 func (p *PorkbunProvider) Resources(ctx context.Context) []func() resource.Resource {
@@ -137,7 +138,9 @@ func (p *PorkbunProvider) Resources(ctx context.Context) []func() resource.Resou
 }
 
 func (p *PorkbunProvider) EphemeralResources(ctx context.Context) []func() ephemeral.EphemeralResource {
-	return []func() ephemeral.EphemeralResource{}
+	return []func() ephemeral.EphemeralResource{
+		NewSSLEphemeralResource,
+	}
 }
 
 func (p *PorkbunProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
@@ -196,6 +199,24 @@ func ConfigureResource(req resource.ConfigureRequest, resp *resource.ConfigureRe
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
+			fmt.Sprintf("Expected *porkbun.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+		return nil
+	}
+
+	return client
+}
+
+// ConfigureEphemeralResource is a helper function to configure an ephemeral resource with a porkbun client.
+func ConfigureEphemeralResource(req ephemeral.ConfigureRequest, resp *ephemeral.ConfigureResponse) *porkbun.Client {
+	if req.ProviderData == nil {
+		return nil
+	}
+
+	client, ok := req.ProviderData.(*porkbun.Client)
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Data Source Configure Type",
 			fmt.Sprintf("Expected *porkbun.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 		return nil
