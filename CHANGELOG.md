@@ -1,4 +1,9 @@
-## 1.2.0 (unreleased)
+## 1.2.1 (unreleased)
+
+## 1.2.0 (2025-05-02)
+
+> As of this release, the provider is
+> now [available on the OpenTofu registry](https://search.opentofu.org/provider/marcfrederick/porkbun).
 
 FEATURES:
 
