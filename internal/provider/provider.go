@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/ephemeral"
 	"github.com/hashicorp/terraform-plugin-framework/function"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -189,53 +190,20 @@ func New(version string) func() provider.Provider {
 	}
 }
 
-// ConfigureResource is a helper function to configure a resource with a porkbun client.
-func ConfigureResource(req resource.ConfigureRequest, resp *resource.ConfigureResponse) *porkbun.Client {
-	if req.ProviderData == nil {
+// getPorkbunClient retrieves the Porkbun client from the provider data.
+//
+// It returns nil if the provider data is nil or if the type assertion fails.
+// In case of an error, it adds an error to the diagnostics.
+func getPorkbunClient(providerData any, diagnostics diag.Diagnostics) *porkbun.Client {
+	if providerData == nil {
 		return nil
 	}
 
-	client, ok := req.ProviderData.(*porkbun.Client)
+	client, ok := providerData.(*porkbun.Client)
 	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *porkbun.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-		return nil
-	}
-
-	return client
-}
-
-// ConfigureEphemeralResource is a helper function to configure an ephemeral resource with a porkbun client.
-func ConfigureEphemeralResource(req ephemeral.ConfigureRequest, resp *ephemeral.ConfigureResponse) *porkbun.Client {
-	if req.ProviderData == nil {
-		return nil
-	}
-
-	client, ok := req.ProviderData.(*porkbun.Client)
-	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected Data Source Configure Type",
-			fmt.Sprintf("Expected *porkbun.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-		return nil
-	}
-
-	return client
-}
-
-// ConfigureDataSource is a helper function to configure a data source with a porkbun client.
-func ConfigureDataSource(req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) *porkbun.Client {
-	if req.ProviderData == nil {
-		return nil
-	}
-
-	client, ok := req.ProviderData.(*porkbun.Client)
-	if !ok {
-		resp.Diagnostics.AddError(
-			"Unexpected Data Source Configure Type",
-			fmt.Sprintf("Expected *porkbun.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		diagnostics.AddError(
+			"Unexpected ProviderData",
+			fmt.Sprintf("Expected *porkbun.Client, got: %T. Please report this issue to the provider developers.", providerData),
 		)
 		return nil
 	}

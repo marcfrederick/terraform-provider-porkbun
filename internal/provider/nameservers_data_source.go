@@ -49,7 +49,7 @@ func (d *DomainNameserversDataSource) Schema(ctx context.Context, req datasource
 }
 
 func (d *DomainNameserversDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	d.client = ConfigureDataSource(req, resp)
+	d.client = getPorkbunClient(req.ProviderData, resp.Diagnostics)
 }
 
 func (d *DomainNameserversDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {

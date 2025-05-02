@@ -61,7 +61,7 @@ func (d *SSLDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 }
 
 func (d *SSLDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	d.client = ConfigureDataSource(req, resp)
+	d.client = getPorkbunClient(req.ProviderData, resp.Diagnostics)
 }
 
 func (d *SSLDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {

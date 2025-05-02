@@ -53,7 +53,7 @@ func (r *DomainNameserversResource) Schema(ctx context.Context, req resource.Sch
 }
 
 func (r *DomainNameserversResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	r.client = ConfigureResource(req, resp)
+	r.client = getPorkbunClient(req.ProviderData, resp.Diagnostics)
 }
 
 func (r *DomainNameserversResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {

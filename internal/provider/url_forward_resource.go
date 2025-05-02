@@ -102,7 +102,7 @@ func (r *URLForwardResource) Schema(ctx context.Context, req resource.SchemaRequ
 }
 
 func (r *URLForwardResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	r.client = ConfigureResource(req, resp)
+	r.client = getPorkbunClient(req.ProviderData, resp.Diagnostics)
 }
 
 func (r *URLForwardResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {

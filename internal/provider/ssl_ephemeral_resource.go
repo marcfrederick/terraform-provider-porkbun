@@ -60,7 +60,7 @@ func (r *SSLEphemeralResource) Schema(ctx context.Context, _ ephemeral.SchemaReq
 }
 
 func (r *SSLEphemeralResource) Configure(ctx context.Context, req ephemeral.ConfigureRequest, resp *ephemeral.ConfigureResponse) {
-	r.client = ConfigureEphemeralResource(req, resp)
+	r.client = getPorkbunClient(req.ProviderData, resp.Diagnostics)
 }
 
 func (r *SSLEphemeralResource) Open(ctx context.Context, req ephemeral.OpenRequest, resp *ephemeral.OpenResponse) {
