@@ -20,7 +20,19 @@ import (
 	"github.com/tuzzmaniandevil/porkbun-go"
 )
 
-const defaultMaxRetries = 3
+const (
+	providerType = "porkbun"
+
+	// Provider argument names.
+	argAPIKey       = "api_key"
+	argSecretAPIKey = "secret_api_key"
+	argIPv4Only     = "ipv4_only"
+	argMaxRetries   = "max_retries"
+
+	// Default values for provider arguments.
+	argIPV4OnlyDefault   = false
+	argMaxRetriesDefault = 3
+)
 
 // Ensure PorkbunProvider satisfies various provider interfaces.
 var (
@@ -43,7 +55,7 @@ type PorkbunProviderModel struct {
 }
 
 func (p *PorkbunProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "porkbun"
+	resp.TypeName = providerType
 	resp.Version = p.version
 }
 
@@ -51,22 +63,22 @@ func (p *PorkbunProvider) Schema(ctx context.Context, req provider.SchemaRequest
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Provider for managing domains, DNS records, URL forwarding, and nameserver configurations for domains registered with Porkbun.",
 		Attributes: map[string]schema.Attribute{
-			"api_key": schema.StringAttribute{
+			argAPIKey: schema.StringAttribute{
 				MarkdownDescription: "API key for authentication. Can also be set using the `PORKBUN_API_KEY` environment variable.",
 				Sensitive:           true,
 				Optional:            true,
 			},
-			"secret_api_key": schema.StringAttribute{
+			argSecretAPIKey: schema.StringAttribute{
 				MarkdownDescription: "Secret API key for authentication. Can also be set using the `PORKBUN_SECRET_API_KEY` environment variable.",
 				Sensitive:           true,
 				Optional:            true,
 			},
-			"ipv4_only": schema.BoolAttribute{
+			argIPv4Only: schema.BoolAttribute{
 				MarkdownDescription: "Use IPv4 only for API requests. Defaults to false.",
 				Optional:            true,
 			},
-			"max_retries": schema.Int64Attribute{
-				MarkdownDescription: fmt.Sprintf("Maximum number of retries for API requests. Defaults to %d.", defaultMaxRetries),
+			argMaxRetries: schema.Int64Attribute{
+				MarkdownDescription: fmt.Sprintf("Maximum number of retries for API requests. Defaults to %d.", argMaxRetriesDefault),
 				Optional:            true,
 			},
 		},
@@ -81,10 +93,10 @@ func (p *PorkbunProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	p.validateUnknownAttribute(resp, data.APIKey, path.Root("api_key"), "Porkbun API Key")
-	p.validateUnknownAttribute(resp, data.SecretAPIKey, path.Root("secret_api_key"), "Porkbun Secret API Key")
-	p.validateUnknownAttribute(resp, data.IPv4Only, path.Root("ipv4_only"), "Porkbun IPv4 Flag")
-	p.validateUnknownAttribute(resp, data.MaxRetries, path.Root("max_retries"), "Max Retries Count")
+	p.validateUnknownAttribute(resp, data.APIKey, path.Root(argAPIKey), "Porkbun API Key")
+	p.validateUnknownAttribute(resp, data.SecretAPIKey, path.Root(argSecretAPIKey), "Porkbun Secret API Key")
+	p.validateUnknownAttribute(resp, data.IPv4Only, path.Root(argIPv4Only), "Porkbun IPv4 Flag")
+	p.validateUnknownAttribute(resp, data.MaxRetries, path.Root(argMaxRetries), "Max Retries Count")
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -93,20 +105,25 @@ func (p *PorkbunProvider) Configure(ctx context.Context, req provider.ConfigureR
 	if !data.APIKey.IsNull() {
 		apiKey = data.APIKey.ValueString()
 	}
-	p.validateMissingAttribute(resp, apiKey, "Porkbun API Key", path.Root("api_key"))
+	p.validateMissingAttribute(resp, apiKey, "Porkbun API Key", path.Root(argAPIKey))
 
 	secretAPIKey := os.Getenv("PORKBUN_SECRET_API_KEY")
 	if !data.SecretAPIKey.IsNull() {
 		secretAPIKey = data.SecretAPIKey.ValueString()
 	}
-	p.validateMissingAttribute(resp, secretAPIKey, "Porkbun Secret API Key", path.Root("secret_api_key"))
+	p.validateMissingAttribute(resp, secretAPIKey, "Porkbun Secret API Key", path.Root(argSecretAPIKey))
 
-	maxRetries := defaultMaxRetries
+	ipv4Only := argIPV4OnlyDefault
+	if !data.IPv4Only.IsNull() {
+		ipv4Only = data.IPv4Only.ValueBool()
+	}
+
+	maxRetries := argMaxRetriesDefault
 	if !data.MaxRetries.IsNull() {
 		maxRetries = int(data.MaxRetries.ValueInt64())
 		if maxRetries < 0 {
 			resp.Diagnostics.AddAttributeError(
-				path.Root("max_retries"),
+				path.Root(argMaxRetries),
 				"Invalid Max Retries Count",
 				"The maximum number of retries for API requests must be a non-negative integer.",
 			)
@@ -121,7 +138,7 @@ func (p *PorkbunProvider) Configure(ctx context.Context, req provider.ConfigureR
 	client := porkbun.NewClient(&porkbun.Options{
 		ApiKey:       apiKey,
 		SecretApiKey: secretAPIKey,
-		IPv4Only:     data.IPv4Only.ValueBool(),
+		IPv4Only:     ipv4Only,
 		HttpClient:   &httpClient,
 	})
 
