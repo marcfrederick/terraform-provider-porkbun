@@ -1,4 +1,8 @@
-## 1.2.1 (unreleased)
+## 1.3.0 (unreleased)
+
+FEATURES:
+
+- **New Resource:** `porkbun_dnssec_record`
 
 ## 1.2.0 (2025-05-02)
 

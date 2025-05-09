@@ -31,7 +31,7 @@ resource "porkbun_url_forward" "example" {
 - `domain` (String) The domain name for which to configure URL forwarding (e.g., example.com).
 - `include_path` (Boolean) Whether or not to include the URI path in the redirection.
 - `location` (String) Where you'd like to forward the domain to.
-- `type` (String) The type of forward. Valid types are: temporary or permanent
+- `type` (String) The type of forward (temporary, permanent).
 - `wildcard` (Boolean) Also forward all subdomains of the domain.
 
 ### Optional
