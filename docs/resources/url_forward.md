@@ -29,14 +29,14 @@ resource "porkbun_url_forward" "example" {
 ### Required
 
 - `domain` (String) The domain name for which to configure URL forwarding (e.g., example.com).
-- `include_path` (Boolean) When set to true, paths will be preserved in the forwarding. For example, requests to 'www.example.com/page.html' will be forwarded to 'destination.com/page.html'.
-- `location` (String) The destination URL for the forward. Must be a fully qualified URL including the protocol (e.g., https://destination.com).
-- `type` (String) The type of forward: 'temporary' (HTTP 302) or 'permanent' (HTTP 301).
-- `wildcard` (Boolean) When set to true, enables wildcard forwarding. This allows the forward to match any subdomain not explicitly defined by another forward record.
+- `include_path` (Boolean) Whether or not to include the URI path in the redirection.
+- `location` (String) Where you'd like to forward the domain to.
+- `type` (String) The type of forward. Valid types are: temporary or permanent
+- `wildcard` (Boolean) Also forward all subdomains of the domain.
 
 ### Optional
 
-- `subdomain` (String) The subdomain to forward. Leave empty for the apex domain. Use '*' for wildcard forwarding when combined with the wildcard option.
+- `subdomain` (String) A subdomain that you would like to add URL forwarding for. Leave this blank to forward the root domain.
 
 ### Read-Only
 

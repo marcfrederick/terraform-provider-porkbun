@@ -25,7 +25,7 @@ resource "porkbun_nameservers" "example" {
 ### Required
 
 - `domain` (String) The domain name to manage nameservers for. Must be a domain registered with Porkbun.
-- `nameservers` (List of String) The list of nameservers to set for the domain.
+- `nameservers` (List of String) A list of name server host names.
 
 ## Import
 

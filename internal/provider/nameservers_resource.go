@@ -44,7 +44,7 @@ func (r *DomainNameserversResource) Schema(ctx context.Context, req resource.Sch
 				Required:            true,
 			},
 			"nameservers": schema.ListAttribute{
-				MarkdownDescription: "The list of nameservers to set for the domain. ", // Use Porkbun default nameservers by deleting this resource.",
+				MarkdownDescription: "A list of name server host names.",
 				ElementType:         types.StringType,
 				Required:            true,
 			},

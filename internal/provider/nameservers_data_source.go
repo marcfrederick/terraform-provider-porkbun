@@ -40,7 +40,7 @@ func (d *DomainNameserversDataSource) Schema(ctx context.Context, req datasource
 				Required:            true,
 			},
 			"nameservers": schema.ListAttribute{
-				MarkdownDescription: "The list of nameservers currently configured for the domain.",
+				MarkdownDescription: "A list of name server host names.",
 				ElementType:         types.StringType,
 				Computed:            true,
 			},

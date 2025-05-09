@@ -44,16 +44,16 @@ func (d *SSLDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 				Required:            true,
 			},
 			"certificate_chain": schema.StringAttribute{
-				MarkdownDescription: "The certificate chain for the SSL certificate, which includes intermediate certificates needed for validation.",
+				MarkdownDescription: "The complete certificate chain.",
 				Computed:            true,
 			},
 			"private_key": schema.StringAttribute{
-				MarkdownDescription: "The private key for the SSL certificate.",
+				MarkdownDescription: "The private key.",
 				Computed:            true,
 				Sensitive:           true,
 			},
 			"public_key": schema.StringAttribute{
-				MarkdownDescription: "The public key (certificate) for the SSL certificate, containing the domain's identity and public key.",
+				MarkdownDescription: "The public key.",
 				Computed:            true,
 			},
 		},

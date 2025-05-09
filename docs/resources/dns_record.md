@@ -28,15 +28,15 @@ resource "porkbun_dns_record" "example" {
 
 ### Required
 
-- `content` (String) The content of the DNS record. Format depends on the record type (e.g., IP address for A records, target domain for CNAME records).
+- `content` (String) The answer content for the record. Please see the DNS management popup from the domain management console for proper formatting of each record type.
 - `domain` (String) The domain name for which to create the DNS record (e.g., example.com).
-- `subdomain` (String) The subdomain for the record being created, not including the domain itself. Use an empty string for the apex domain.
+- `subdomain` (String) The subdomain for the record being created, not including the domain itself. Leave blank to create a record on the root domain. Use * to create a wildcard record.
 - `type` (String) The type of DNS record to create (A, AAAA, CNAME, MX, TXT, NS, ALIAS, SRV, TLSA, CAA, HTTPS, SVCB).
 
 ### Optional
 
-- `prio` (Number) The priority for the DNS record. Only used for certain record types like MX and SRV. Default is 0.
-- `ttl` (Number) The Time To Live (TTL) for the DNS record in seconds. Minimum value is 600 seconds (10 minutes). Default is 600.
+- `prio` (Number) The priority of the record for those that support it.
+- `ttl` (Number) The time to live in seconds for the record. The minimum and the default is 600 seconds.
 
 ### Read-Only
 

@@ -27,4 +27,4 @@ data "porkbun_nameservers" "example" {
 
 ### Read-Only
 
-- `nameservers` (List of String) The list of nameservers currently configured for the domain.
+- `nameservers` (List of String) A list of name server host names.

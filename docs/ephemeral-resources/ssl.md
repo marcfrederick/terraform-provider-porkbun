@@ -27,6 +27,6 @@ ephemeral "porkbun_ssl" "example" {
 
 ### Read-Only
 
-- `certificate_chain` (String) The certificate chain for the SSL certificate, which includes intermediate certificates needed for validation.
-- `private_key` (String, Sensitive) The private key for the SSL certificate.
-- `public_key` (String) The public key (certificate) for the SSL certificate, containing the domain's identity and public key.
+- `certificate_chain` (String) The complete certificate chain.
+- `private_key` (String, Sensitive) The private key.
+- `public_key` (String) The public key.

@@ -62,21 +62,21 @@ func (r *URLForwardResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"subdomain": schema.StringAttribute{
 				Optional:            true,
-				MarkdownDescription: "The subdomain to forward. Leave empty for the apex domain. Use '*' for wildcard forwarding when combined with the wildcard option.",
+				MarkdownDescription: "A subdomain that you would like to add URL forwarding for. Leave this blank to forward the root domain.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"location": schema.StringAttribute{
 				Required:            true,
-				MarkdownDescription: "The destination URL for the forward. Must be a fully qualified URL including the protocol (e.g., https://destination.com).",
+				MarkdownDescription: "Where you'd like to forward the domain to.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"type": schema.StringAttribute{
 				Required:            true,
-				MarkdownDescription: "The type of forward: 'temporary' (HTTP 302) or 'permanent' (HTTP 301).",
+				MarkdownDescription: "The type of forward (temporary, permanent).",
 				Validators: []validator.String{
 					enumvalidator.Valid(porkbun.Temporary, porkbun.Permanent),
 				},
@@ -86,14 +86,14 @@ func (r *URLForwardResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"include_path": schema.BoolAttribute{
 				Required:            true,
-				MarkdownDescription: "When set to true, paths will be preserved in the forwarding. For example, requests to 'www.example.com/page.html' will be forwarded to 'destination.com/page.html'.",
+				MarkdownDescription: "Whether or not to include the URI path in the redirection.",
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.RequiresReplace(),
 				},
 			},
 			"wildcard": schema.BoolAttribute{
 				Required:            true,
-				MarkdownDescription: "When set to true, enables wildcard forwarding. This allows the forward to match any subdomain not explicitly defined by another forward record.",
+				MarkdownDescription: "Also forward all subdomains of the domain.",
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.RequiresReplace(),
 				},

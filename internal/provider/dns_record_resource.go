@@ -68,7 +68,7 @@ func (r *DNSRecordResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"subdomain": schema.StringAttribute{
-				MarkdownDescription: "The subdomain for the record being created, not including the domain itself. Use an empty string for the apex domain.",
+				MarkdownDescription: "The subdomain for the record being created, not including the domain itself. Leave blank to create a record on the root domain. Use * to create a wildcard record.",
 				Required:            true,
 			},
 			"type": schema.StringAttribute{
@@ -92,11 +92,11 @@ func (r *DNSRecordResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"content": schema.StringAttribute{
-				MarkdownDescription: "The content of the DNS record. Format depends on the record type (e.g., IP address for A records, target domain for CNAME records).",
+				MarkdownDescription: "The answer content for the record. Please see the DNS management popup from the domain management console for proper formatting of each record type.",
 				Required:            true,
 			},
 			"ttl": schema.Int64Attribute{
-				MarkdownDescription: "The Time To Live (TTL) for the DNS record in seconds. Minimum value is 600 seconds (10 minutes). Default is 600.",
+				MarkdownDescription: "The time to live in seconds for the record. The minimum and the default is 600 seconds.",
 				Optional:            true,
 				Computed:            true,
 				Default:             int64default.StaticInt64(600),
@@ -105,7 +105,7 @@ func (r *DNSRecordResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"prio": schema.Int64Attribute{
-				MarkdownDescription: "The priority for the DNS record. Only used for certain record types like MX and SRV. Default is 0.",
+				MarkdownDescription: "The priority of the record for those that support it.",
 				Optional:            true,
 				Computed:            true,
 				Default:             int64default.StaticInt64(0),
