@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
@@ -15,6 +14,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/tuzzmaniandevil/porkbun-go"
+
+	"github.com/marcfrederick/terraform-provider-porkbun/internal/validator/enumvalidator"
 )
 
 var (
@@ -77,7 +78,7 @@ func (r *URLForwardResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Required:            true,
 				MarkdownDescription: "The type of forward: 'temporary' (HTTP 302) or 'permanent' (HTTP 301).",
 				Validators: []validator.String{
-					stringvalidator.OneOf(string(porkbun.Temporary), string(porkbun.Permanent)),
+					enumvalidator.Valid(porkbun.Temporary, porkbun.Permanent),
 				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),

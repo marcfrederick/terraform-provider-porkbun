@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
@@ -18,6 +17,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/tuzzmaniandevil/porkbun-go"
+
+	"github.com/marcfrederick/terraform-provider-porkbun/internal/validator/enumvalidator"
 )
 
 var (
@@ -74,7 +75,20 @@ func (r *DNSRecordResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "The type of DNS record to create (A, AAAA, CNAME, MX, TXT, NS, ALIAS, SRV, TLSA, CAA, HTTPS, SVCB).",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf("A", "MX", "CNAME", "ALIAS", "TXT", "NS", "AAAA", "SRV", "TLSA", "CAA", "HTTPS", "SVCB"),
+					enumvalidator.Valid(
+						porkbun.A,
+						porkbun.MX,
+						porkbun.CNAME,
+						porkbun.ALIAS,
+						porkbun.TXT,
+						porkbun.NS,
+						porkbun.AAAA,
+						porkbun.SRV,
+						porkbun.TLSA,
+						porkbun.CAA,
+						porkbun.HTTPS,
+						porkbun.SVCB,
+					),
 				},
 			},
 			"content": schema.StringAttribute{
