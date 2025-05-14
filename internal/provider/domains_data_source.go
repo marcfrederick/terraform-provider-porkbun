@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -79,29 +80,15 @@ func (d *DomainsDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	var domainValues []attr.Value
-	start := 0
+	domains, err := listDomains(ctx, d.client)
+	if err != nil {
+		resp.Diagnostics.AddError("Error Listing Domains", err.Error())
+		return
+	}
 
-	for {
-		opts := porkbun.DomainListOptions{
-			Start:         porkbun.String(strconv.Itoa(start)),
-			IncludeLabels: porkbun.String("yes"),
-		}
-
-		listDomainsResp, err := d.client.Domains.ListDomains(ctx, &opts)
-		if err != nil {
-			resp.Diagnostics.AddError("Error Reading Domains", err.Error())
-			return
-		}
-
-		for _, domain := range listDomainsResp.Domains {
-			domainValues = append(domainValues, convertDomainToObjectValue(domain))
-		}
-
-		if len(listDomainsResp.Domains) < listDomainsBatchSize {
-			break
-		}
-		start += listDomainsBatchSize
+	domainValues := make([]attr.Value, len(domains))
+	for i, domain := range domains {
+		domainValues[i] = convertDomainToObjectValue(domain)
 	}
 
 	data.Domains = types.ListValueMust(
@@ -110,6 +97,37 @@ func (d *DomainsDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+// listDomains retrieves the list of domains from the Porkbun API.
+func listDomains(ctx context.Context, client *porkbun.Client) ([]porkbun.Domain, error) {
+	start := 0
+	opts := porkbun.DomainListOptions{
+		IncludeLabels: porkbun.String("yes"),
+	}
+
+	var result []porkbun.Domain
+	for {
+		if ctx.Err() != nil {
+			return nil, fmt.Errorf("context error: %w", ctx.Err())
+		}
+
+		opts.Start = porkbun.String(strconv.Itoa(start))
+
+		resp, err := client.Domains.ListDomains(ctx, &opts)
+		if err != nil {
+			return nil, fmt.Errorf("error listing domains at start=%d: %w", start, err)
+		}
+
+		if len(resp.Domains) == 0 {
+			break
+		}
+
+		result = append(result, resp.Domains...)
+		start += len(resp.Domains)
+	}
+
+	return result, nil
 }
 
 // convertDomainToObjectValue converts a porkbun.Domain to an attr.Value.

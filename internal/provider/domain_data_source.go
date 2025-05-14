@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -12,15 +11,6 @@ import (
 
 	"github.com/tuzzmaniandevil/porkbun-go"
 )
-
-// listDomainsBatchSize defines the batch size for listing domains.
-//
-// This is used to paginate through the list of domains when retrieving them
-// from the API. Porkbun returns a maximum of 1000 domains per request, so we
-// set this constant to 1000 to match that limit.
-//
-// https://porkbun.com/api/json/v3/documentation#Domain%20List%20All
-const listDomainsBatchSize = 1000
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &DomainDataSource{}
@@ -130,29 +120,15 @@ func (d *DomainDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 
 // findDomain retrieves the domain information from the Porkbun API.
 func (d *DomainDataSource) findDomain(ctx context.Context, domainName string) (*porkbun.Domain, error) {
-	start := 0
-	for {
-		opts := porkbun.DomainListOptions{
-			Start:         porkbun.String(strconv.Itoa(start)),
-			IncludeLabels: porkbun.String("yes"),
-		}
+	domains, err := listDomains(ctx, d.client)
+	if err != nil {
+		return nil, fmt.Errorf("error paginating domains: %w", err)
+	}
 
-		domainResp, err := d.client.Domains.ListDomains(ctx, &opts)
-		if err != nil {
-			return nil, fmt.Errorf("error listing domains: %w", err)
+	for _, domain := range domains {
+		if domain.Domain == domainName {
+			return &domain, nil
 		}
-
-		for _, domain := range domainResp.Domains {
-			if domain.Domain == domainName {
-				return &domain, nil
-			}
-		}
-
-		if len(domainResp.Domains) < listDomainsBatchSize {
-			break
-		}
-
-		start += listDomainsBatchSize
 	}
 
 	return nil, fmt.Errorf("domain %s not found", domainName)
