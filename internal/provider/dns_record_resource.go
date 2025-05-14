@@ -18,6 +18,7 @@ import (
 
 	"github.com/tuzzmaniandevil/porkbun-go"
 
+	"github.com/marcfrederick/terraform-provider-porkbun/internal/util"
 	"github.com/marcfrederick/terraform-provider-porkbun/internal/validator/enumvalidator"
 )
 
@@ -175,17 +176,16 @@ func (r *DNSRecordResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	data.ID = types.Int64Value(*record.ID)
+	data.ID = types.Int64PointerValue(record.ID)
 	data.Subdomain = types.StringValue(subdomain)
 	data.Type = types.StringValue(string(record.Type))
 	data.Content = types.StringValue(record.Content)
 	data.Notes = types.StringValue(record.Notes)
-
-	ttl, _ := strconv.ParseInt(record.TTL, 10, 64)
-	data.TTL = types.Int64Value(ttl)
-
-	prio, _ := strconv.ParseInt(record.Prio, 10, 64)
-	data.Prio = types.Int64Value(prio)
+	data.TTL = util.Int64Value(record.TTL, &resp.Diagnostics)
+	data.Prio = util.Int64Value(record.Prio, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -240,16 +240,15 @@ func (r *DNSRecordResource) ImportState(ctx context.Context, req resource.Import
 		return
 	}
 
-	id, err := strconv.ParseInt(recordID, 10, 64)
-	if err != nil {
-		resp.Diagnostics.AddError("Invalid Import ID", fmt.Sprintf("Failed to parse record ID as integer. Expected format: <domain>:<record_id>. Error: %s", err.Error()))
+	model := &DNSRecordResourceModel{
+		Domain: types.StringValue(domain),
+		ID:     util.Int64Value(recordID, &resp.Diagnostics),
+	}
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &DNSRecordResourceModel{
-		Domain: types.StringValue(domain),
-		ID:     types.Int64Value(id),
-	})...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, model)...)
 }
 
 // getDNSRecord fetches the DNS record from Porkbun using the domain and record ID.

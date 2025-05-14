@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/tuzzmaniandevil/porkbun-go"
+
+	"github.com/marcfrederick/terraform-provider-porkbun/internal/util"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -109,11 +111,15 @@ func (d *DomainDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	data.Domain = types.StringValue(domain.Domain)
 	data.Status = types.StringValue(domain.Status)
 	data.TLD = types.StringValue(domain.TLD)
-	data.SecurityLock = types.BoolValue(bool(domain.SecurityLock))
-	data.WhoisPrivacy = types.BoolValue(bool(domain.WhoisPrivacy))
-	data.AutoRenew = types.BoolValue(bool(domain.AutoRenew))
-	data.NotLocal = types.BoolValue(bool(domain.NotLocal))
-	data.Labels = convertDomainLabelsToList(domain.Labels)
+	data.SecurityLock = util.BoolValue(domain.SecurityLock, &resp.Diagnostics)
+	data.WhoisPrivacy = util.BoolValue(domain.WhoisPrivacy, &resp.Diagnostics)
+	data.AutoRenew = util.BoolValue(domain.AutoRenew, &resp.Diagnostics)
+	data.NotLocal = util.BoolValue(domain.NotLocal, &resp.Diagnostics)
+	data.Labels = util.MustMapToList(domain.Labels, types.ObjectType{AttrTypes: domainLabelObjectAttrs}, convertDomainLabelToObjectValue)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -134,23 +140,14 @@ func (d *DomainDataSource) findDomain(ctx context.Context, domainName string) (*
 	return nil, fmt.Errorf("domain %s not found", domainName)
 }
 
-// convertDomainLabelsToList converts a slice of porkbun.Label to a types.List of objects.
-func convertDomainLabelsToList(labels []porkbun.Label) types.List {
-	result := make([]attr.Value, len(labels))
-
-	for i, label := range labels {
-		result[i] = types.ObjectValueMust(
-			domainLabelObjectAttrs,
-			map[string]attr.Value{
-				"id":    types.StringValue(label.ID),
-				"title": types.StringValue(label.Title),
-				"color": types.StringValue(label.Color),
-			},
-		)
-	}
-
-	return types.ListValueMust(
-		types.ObjectType{AttrTypes: domainLabelObjectAttrs},
-		result,
+// convertDomainLabelToObjectValue converts a porkbun.Label to a types.ObjectValue.
+func convertDomainLabelToObjectValue(label porkbun.Label) attr.Value {
+	return types.ObjectValueMust(
+		domainLabelObjectAttrs,
+		map[string]attr.Value{
+			"id":    types.StringValue(label.ID),
+			"title": types.StringValue(label.Title),
+			"color": types.StringValue(label.Color),
+		},
 	)
 }

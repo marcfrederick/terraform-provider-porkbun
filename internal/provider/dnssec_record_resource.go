@@ -19,6 +19,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/tuzzmaniandevil/porkbun-go"
 
+	"github.com/marcfrederick/terraform-provider-porkbun/internal/util"
 	"github.com/marcfrederick/terraform-provider-porkbun/internal/validator/enumvalidator"
 )
 
@@ -246,26 +247,25 @@ func (r *DNSSECRecordResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	if dnssecRecord.Alg != "" {
-		algorithm, _ := strconv.ParseInt(string(dnssecRecord.Alg), 10, 64)
-		digestType, _ := strconv.ParseInt(string(dnssecRecord.DigestType), 10, 64)
 		data.DSData = &DNSSECDSDataModel{
 			KeyTag:     types.StringValue(dnssecRecord.KeyTag),
-			Algorithm:  types.Int64Value(algorithm),
-			DigestType: types.Int64Value(digestType),
+			Algorithm:  util.Int64Value(dnssecRecord.Alg, &resp.Diagnostics),
+			DigestType: util.Int64Value(dnssecRecord.DigestType, &resp.Diagnostics),
 			Digest:     types.StringValue(dnssecRecord.Digest),
 		}
 	}
 
 	if dnssecRecord.KeyDataFlags != nil {
-		flags, _ := strconv.ParseInt(*dnssecRecord.KeyDataFlags, 10, 64)
-		protocol, _ := strconv.ParseInt(*dnssecRecord.KeyDataProtocol, 10, 64)
-		algorithm, _ := strconv.ParseInt(string(*dnssecRecord.KeyDataAlgo), 10, 64)
 		data.KeyData = &DNSSECKeyDataModel{
-			Flags:     types.Int64Value(flags),
-			Protocol:  types.Int64Value(protocol),
-			Algorithm: types.Int64Value(algorithm),
-			PublicKey: types.StringValue(*dnssecRecord.KeyDataPubKey),
+			Flags:     util.Int64PointerValue(dnssecRecord.KeyDataFlags, &resp.Diagnostics),
+			Protocol:  util.Int64PointerValue(dnssecRecord.KeyDataProtocol, &resp.Diagnostics),
+			Algorithm: util.Int64PointerValue(dnssecRecord.KeyDataProtocol, &resp.Diagnostics),
+			PublicKey: types.StringPointerValue(dnssecRecord.KeyDataPubKey),
 		}
+	}
+
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

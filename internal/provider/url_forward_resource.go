@@ -15,6 +15,7 @@ import (
 
 	"github.com/tuzzmaniandevil/porkbun-go"
 
+	"github.com/marcfrederick/terraform-provider-porkbun/internal/util"
 	"github.com/marcfrederick/terraform-provider-porkbun/internal/validator/enumvalidator"
 )
 
@@ -140,8 +141,12 @@ func (r *URLForwardResource) Read(ctx context.Context, req resource.ReadRequest,
 	data.Subdomain = types.StringValue(forward.Subdomain)
 	data.Location = types.StringValue(forward.Location)
 	data.Type = types.StringValue(string(forward.Type))
-	data.IncludePath = types.BoolValue(forward.IncludePath == "yes")
-	data.Wildcard = types.BoolValue(forward.Wildcard == "yes")
+	data.IncludePath = util.BoolValue(forward.IncludePath, &resp.Diagnostics)
+	data.Wildcard = util.BoolValue(forward.Wildcard, &resp.Diagnostics)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

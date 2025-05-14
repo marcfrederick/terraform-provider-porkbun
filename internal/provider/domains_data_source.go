@@ -8,9 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/tuzzmaniandevil/porkbun-go"
+
+	"github.com/marcfrederick/terraform-provider-porkbun/internal/util"
 )
 
 var _ datasource.DataSource = &DomainsDataSource{}
@@ -86,15 +89,10 @@ func (d *DomainsDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	domainValues := make([]attr.Value, len(domains))
-	for i, domain := range domains {
-		domainValues[i] = convertDomainToObjectValue(domain)
+	data.Domains = convertDomainsToList(domains, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
 	}
-
-	data.Domains = types.ListValueMust(
-		types.ObjectType{AttrTypes: domainObjectAttrs},
-		domainValues,
-	)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -130,19 +128,26 @@ func listDomains(ctx context.Context, client *porkbun.Client) ([]porkbun.Domain,
 	return result, nil
 }
 
+// convertDomainLabelsToList converts a slice of porkbun.Domain to a types.List.
+func convertDomainsToList(domains []porkbun.Domain, diagnostics *diag.Diagnostics) types.List {
+	return util.MustMapToList(domains, types.ObjectType{AttrTypes: domainObjectAttrs}, func(domain porkbun.Domain) attr.Value {
+		return convertDomainToObjectValue(domain, diagnostics)
+	})
+}
+
 // convertDomainToObjectValue converts a porkbun.Domain to an attr.Value.
-func convertDomainToObjectValue(domain porkbun.Domain) attr.Value {
+func convertDomainToObjectValue(domain porkbun.Domain, diagnostics *diag.Diagnostics) attr.Value {
 	return types.ObjectValueMust(
 		domainObjectAttrs,
 		map[string]attr.Value{
 			"domain":        types.StringValue(domain.Domain),
 			"status":        types.StringValue(domain.Status),
 			"tld":           types.StringValue(domain.TLD),
-			"security_lock": types.BoolValue(bool(domain.SecurityLock)),
-			"whois_privacy": types.BoolValue(bool(domain.WhoisPrivacy)),
-			"auto_renew":    types.BoolValue(bool(domain.AutoRenew)),
-			"not_local":     types.BoolValue(bool(domain.NotLocal)),
-			"labels":        convertDomainLabelsToList(domain.Labels),
+			"security_lock": util.BoolValue(domain.SecurityLock, diagnostics),
+			"whois_privacy": util.BoolValue(domain.WhoisPrivacy, diagnostics),
+			"auto_renew":    util.BoolValue(domain.AutoRenew, diagnostics),
+			"not_local":     util.BoolValue(domain.NotLocal, diagnostics),
+			"labels":        util.MustMapToList(domain.Labels, types.ObjectType{AttrTypes: domainLabelObjectAttrs}, convertDomainLabelToObjectValue),
 		},
 	)
 }

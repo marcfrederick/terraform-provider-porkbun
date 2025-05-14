@@ -11,6 +11,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/tuzzmaniandevil/porkbun-go"
+
+	"github.com/marcfrederick/terraform-provider-porkbun/internal/util"
 )
 
 var (
@@ -74,7 +76,7 @@ func (r *DomainNameserversResource) Create(ctx context.Context, req resource.Cre
 		return
 	}
 
-	data.Nameservers = listOfStringsToList(nameservers)
+	data.Nameservers = util.MustMapToList(nameservers, types.StringType, func(s string) attr.Value { return types.StringValue(s) })
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -91,7 +93,7 @@ func (r *DomainNameserversResource) Read(ctx context.Context, req resource.ReadR
 		return
 	}
 
-	data.Nameservers = listOfStringsToList(nsResp.NS)
+	data.Nameservers = util.MustMapToList(nsResp.NS, types.StringType, func(s string) attr.Value { return types.StringValue(s) })
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -113,7 +115,7 @@ func (r *DomainNameserversResource) Update(ctx context.Context, req resource.Upd
 		return
 	}
 
-	data.Nameservers = listOfStringsToList(nameservers)
+	data.Nameservers = util.MustMapToList(nameservers, types.StringType, func(s string) attr.Value { return types.StringValue(s) })
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -148,10 +150,3 @@ func extractNameservers(list types.List) (porkbun.NameServers, error) {
 }
 
 // listOfStringsToList converts a slice of strings to a types.List.
-func listOfStringsToList(values []string) types.List {
-	attrVals := make([]attr.Value, 0, len(values))
-	for _, v := range values {
-		attrVals = append(attrVals, types.StringValue(v))
-	}
-	return types.ListValueMust(types.StringType, attrVals)
-}

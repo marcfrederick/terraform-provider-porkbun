@@ -3,11 +3,14 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/tuzzmaniandevil/porkbun-go"
+
+	"github.com/marcfrederick/terraform-provider-porkbun/internal/util"
 )
 
 var _ datasource.DataSource = &DomainNameserversDataSource{}
@@ -67,6 +70,6 @@ func (d *DomainNameserversDataSource) Read(ctx context.Context, req datasource.R
 		return
 	}
 
-	data.Nameservers = listOfStringsToList(nsResp.NS)
+	data.Nameservers = util.MustMapToList(nsResp.NS, types.StringType, func(s string) attr.Value { return types.StringValue(s) })
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
