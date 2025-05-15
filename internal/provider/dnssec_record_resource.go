@@ -249,8 +249,8 @@ func (r *DNSSECRecordResource) Read(ctx context.Context, req resource.ReadReques
 	if dnssecRecord.Alg != "" {
 		data.DSData = &DNSSECDSDataModel{
 			KeyTag:     types.StringValue(dnssecRecord.KeyTag),
-			Algorithm:  util.Int64Value(dnssecRecord.Alg, &resp.Diagnostics),
-			DigestType: util.Int64Value(dnssecRecord.DigestType, &resp.Diagnostics),
+			Algorithm:  util.Int64Value(string(dnssecRecord.Alg), &resp.Diagnostics),
+			DigestType: util.Int64Value(string(dnssecRecord.DigestType), &resp.Diagnostics),
 			Digest:     types.StringValue(dnssecRecord.Digest),
 		}
 	}

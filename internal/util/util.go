@@ -19,7 +19,7 @@ func MustMapToList[T any](elements []T, elementType attr.Type, f func(T) attr.Va
 }
 
 // BoolValue parses a string or bool value into a types.Bool.
-func BoolValue[T ~bool | ~string](value T, diagnostics *diag.Diagnostics) types.Bool {
+func BoolValue[T bool | string](value T, diagnostics *diag.Diagnostics) types.Bool {
 	switch v := any(value).(type) {
 	case bool:
 		return types.BoolValue(v)
@@ -32,7 +32,7 @@ func BoolValue[T ~bool | ~string](value T, diagnostics *diag.Diagnostics) types.
 }
 
 // Int64PointerValue parses a string or bool pointer value into a types.Int64.1.
-func Int64PointerValue[T ~int64 | ~string](value *T, diagnostics *diag.Diagnostics) types.Int64 {
+func Int64PointerValue[T int64 | string](value *T, diagnostics *diag.Diagnostics) types.Int64 {
 	switch v := any(value).(type) {
 	case nil:
 		return types.Int64Null()
@@ -47,7 +47,7 @@ func Int64PointerValue[T ~int64 | ~string](value *T, diagnostics *diag.Diagnosti
 }
 
 // Int64Value parses a string or int value into a types.Int64.
-func Int64Value[T ~int64 | ~string](value T, diagnostics *diag.Diagnostics) types.Int64 {
+func Int64Value[T int64 | string](value T, diagnostics *diag.Diagnostics) types.Int64 {
 	switch v := any(value).(type) {
 	case int64:
 		return types.Int64Value(v)

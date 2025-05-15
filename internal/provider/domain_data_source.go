@@ -111,10 +111,10 @@ func (d *DomainDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	data.Domain = types.StringValue(domain.Domain)
 	data.Status = types.StringValue(domain.Status)
 	data.TLD = types.StringValue(domain.TLD)
-	data.SecurityLock = util.BoolValue(domain.SecurityLock, &resp.Diagnostics)
-	data.WhoisPrivacy = util.BoolValue(domain.WhoisPrivacy, &resp.Diagnostics)
-	data.AutoRenew = util.BoolValue(domain.AutoRenew, &resp.Diagnostics)
-	data.NotLocal = util.BoolValue(domain.NotLocal, &resp.Diagnostics)
+	data.SecurityLock = util.BoolValue(bool(domain.SecurityLock), &resp.Diagnostics)
+	data.WhoisPrivacy = util.BoolValue(bool(domain.WhoisPrivacy), &resp.Diagnostics)
+	data.AutoRenew = util.BoolValue(bool(domain.AutoRenew), &resp.Diagnostics)
+	data.NotLocal = util.BoolValue(bool(domain.NotLocal), &resp.Diagnostics)
 	data.Labels = util.MustMapToList(domain.Labels, types.ObjectType{AttrTypes: domainLabelObjectAttrs}, convertDomainLabelToObjectValue)
 
 	if resp.Diagnostics.HasError() {
