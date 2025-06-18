@@ -90,7 +90,11 @@ jobs:
           tofu_version: ${{ matrix.version }}
           tofu_wrapper: false
       - run: go mod download
-      - name: Run tests
+      - name: Run unit tests (non-main branches)
+        if: github.ref != 'refs/heads/main'
+        run: go test -v -cover ./internal/provider/
+      - name: Run unit and acceptance tests (main branch only)
+        if: github.ref == 'refs/heads/main'
         env:
           TF_ACC: "1"
           PORKBUN_API_KEY: ${{ secrets.PORKBUN_API_KEY }}
