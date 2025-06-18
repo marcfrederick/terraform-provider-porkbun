@@ -64,9 +64,9 @@ jobs:
       matrix:
         include:
           - engine: terraform
-            version: '1.10.*'
-          - engine: terraform
             version: '1.11.*'
+          - engine: terraform
+            version: '1.12.*'
           - engine: opentofu
             version: '1.8.*'
           - engine: opentofu
