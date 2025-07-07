@@ -2,7 +2,7 @@ module tools
 
 go 1.23.7
 
-require github.com/hashicorp/terraform-plugin-docs v0.21.0
+require github.com/hashicorp/terraform-plugin-docs v0.22.0
 
 require (
 	dario.cat/mergo v1.0.2 // indirect
