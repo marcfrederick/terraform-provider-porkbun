@@ -12,6 +12,9 @@ import (
 )
 
 func TestAccURLForwardResource(t *testing.T) {
+	// FIXME: Get a dedicated Porkbun domain for testing URL forwarding.
+	t.Skipf("The ACCTEST domain is currently not using Porkbuns' nameservers, which is required for URL forwarding to work.")
+
 	const (
 		initialSubdomain = "acctest-url-forward"
 		updatedSubdomain = "acctest-url-forward-updated"

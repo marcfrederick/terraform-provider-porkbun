@@ -22,10 +22,8 @@ func TestAccNameserversDataSource(t *testing.T) {
 						"data.porkbun_nameservers.test",
 						tfjsonpath.New("nameservers"),
 						knownvalue.ListExact([]knownvalue.Check{
-							knownvalue.StringExact("maceio.ns.porkbun.com"),
-							knownvalue.StringExact("salvador.ns.porkbun.com"),
-							knownvalue.StringExact("fortaleza.ns.porkbun.com"),
-							knownvalue.StringExact("curitiba.ns.porkbun.com"),
+							knownvalue.StringExact("kim.ns.cloudflare.com"),
+							knownvalue.StringExact("ishaan.ns.cloudflare.com"),
 						}),
 					),
 				},
