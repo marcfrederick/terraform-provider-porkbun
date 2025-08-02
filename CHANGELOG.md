@@ -1,8 +1,14 @@
-## 1.3.0 (unreleased)
+## 1.3.1 (unreleased)
+
+## 1.3.0 (2025-08-02)
 
 FEATURES:
 
 - **New Resource:** `porkbun_dnssec_record`
+
+BUG FIXES:
+
+- resource/porkbun_dns_record: Fix handling of deleted records when reading state.
 
 ## 1.2.0 (2025-05-02)
 
