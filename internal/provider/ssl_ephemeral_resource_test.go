@@ -2,7 +2,9 @@ package provider
 
 import (
 	"fmt"
+	"os"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -17,7 +19,12 @@ func TestAccSSLEphemeralResource(t *testing.T) {
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.SkipBelow(tfversion.Version1_10_0),
 		},
-		PreCheck:                 func() { testAccPreCheck(t) },
+		PreCheck: func() {
+			if path := os.Getenv("TF_ACC_TERRAFORM_PATH"); strings.HasSuffix(path, "tofu") {
+				t.Skipf("OpenTofu does not support ephemeral resources. Skipping test.")
+			}
+			testAccPreCheck(t)
+		},
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactoriesWithEcho,
 		Steps: []resource.TestStep{
 			{
