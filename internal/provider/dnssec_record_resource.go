@@ -240,9 +240,13 @@ func (r *DNSSECRecordResource) Read(ctx context.Context, req resource.ReadReques
 
 	// FIXME: Some TLDs allow DNSSEC without ds_data and thus key_tag. Figure
 	//        out how the Porkbun API handles this and update the code accordingly.
-	dnssecRecord, err := r.readDNSSECRecord(ctx, data.Domain.ValueString(), data.DSData.KeyTag.ValueString())
+	dnssecRecord, ok, err := r.readDNSSECRecord(ctx, data.Domain.ValueString(), data.DSData.KeyTag.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Error Reading DNSSEC", err.Error())
+		return
+	}
+	if !ok {
+		resp.State.RemoveResource(ctx)
 		return
 	}
 
@@ -313,16 +317,16 @@ func (r *DNSSECRecordResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 // readDNSSECRecord retrieves the DNSSEC record for the specified domain and key tag.
-func (r *DNSSECRecordResource) readDNSSECRecord(ctx context.Context, domain, keyTag string) (*porkbun.DnssecRecordData, error) {
+func (r *DNSSECRecordResource) readDNSSECRecord(ctx context.Context, domain, keyTag string) (*porkbun.DnssecRecordData, bool, error) {
 	resp, err := r.client.Dns.GetDnssecRecords(ctx, domain)
 	if err != nil {
-		return nil, fmt.Errorf("error getting DNSSEC records: %w", err)
+		return nil, false, fmt.Errorf("error getting DNSSEC records: %w", err)
 	}
 
 	dnssecRecord, ok := resp.Records[keyTag]
 	if !ok {
-		return nil, fmt.Errorf("DNSSEC record not found for key tag %s", keyTag)
+		return nil, false, nil
 	}
 
-	return &dnssecRecord, nil
+	return &dnssecRecord, true, nil
 }
