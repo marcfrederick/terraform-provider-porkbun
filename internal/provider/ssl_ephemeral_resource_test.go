@@ -15,6 +15,9 @@ import (
 )
 
 func TestAccSSLEphemeralResource(t *testing.T) {
+	// FIXME: Get a dedicated Porkbun domain for testing URL forwarding.
+	t.Skipf("The ACCTEST domain is currently not using Porkbuns' nameservers")
+
 	resource.Test(t, resource.TestCase{
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.SkipBelow(tfversion.Version1_10_0),
