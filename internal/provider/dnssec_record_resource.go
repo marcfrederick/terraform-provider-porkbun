@@ -260,10 +260,18 @@ func (r *DNSSECRecordResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	if dnssecRecord.KeyDataFlags != nil {
+		var algorithm types.Int64
+		if dnssecRecord.KeyDataAlgo != nil {
+			algo := string(*dnssecRecord.KeyDataAlgo)
+			algorithm = util.Int64Value(algo, &resp.Diagnostics)
+		} else {
+			algorithm = types.Int64Null()
+		}
+
 		data.KeyData = &DNSSECKeyDataModel{
 			Flags:     util.Int64PointerValue(dnssecRecord.KeyDataFlags, &resp.Diagnostics),
 			Protocol:  util.Int64PointerValue(dnssecRecord.KeyDataProtocol, &resp.Diagnostics),
-			Algorithm: util.Int64PointerValue(dnssecRecord.KeyDataProtocol, &resp.Diagnostics),
+			Algorithm: algorithm,
 			PublicKey: types.StringPointerValue(dnssecRecord.KeyDataPubKey),
 		}
 	}
