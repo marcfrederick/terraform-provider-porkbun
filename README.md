@@ -101,6 +101,13 @@ Here are some of them:
   - `porkbun_dns_records` (Data Source)
   - `porkbun_domain_nameservers` (Data Source)
   - `porkbun_domains` (Data Source)
+- [flooopro/porkbun](https://registry.terraform.io/providers/flooopro/porkbun)
+  - `porkbun_dns_record` (Resource)
+  - `porkbun_dnssec_record` (Resource)
+  - `porkbun_domain_nameservers` (Resource)
+  - `porkbun_glue_record` (Resource)
+  - `porkbun_dns_records` (Data Source)
+  - `porkbun_domains` (Data Source)
 
 ## Acknowledgements
 
