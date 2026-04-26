@@ -52,6 +52,9 @@ func Int64Value[T int64 | string](value T, diagnostics *diag.Diagnostics) types.
 	case int64:
 		return types.Int64Value(v)
 	case string:
+		if v == "" {
+			return types.Int64Null()
+		}
 		if i, err := strconv.ParseInt(v, 10, 64); err == nil {
 			return types.Int64Value(i)
 		}
