@@ -139,6 +139,11 @@ func TestInt64Value(t *testing.T) {
 			want:  types.Int64Value(42),
 		},
 		{
+			name:  "empty string",
+			value: "",
+			want:  types.Int64Null(),
+		},
+		{
 			name:  "string invalid",
 			value: "invalid",
 			want:  types.Int64Null(),
