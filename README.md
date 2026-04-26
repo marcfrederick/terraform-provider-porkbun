@@ -111,7 +111,7 @@ Here are some of them:
 
 ## Acknowledgements
 
-- [tuzzmaniandevil](github.com/tuzzmaniandevil) for the [Porkbun API client](github.com/tuzzmaniandevil/porkbun-go).
+- [tuzzmaniandevil](https://github.com/tuzzmaniandevil) for the [Porkbun API client](https://github.com/tuzzmaniandevil/porkbun-go).
 - [HashiCorp](https://www.hashicorp.com) for
-  the [Terraform Plugin Framework](github.com/hashicorp/terraform-plugin-framework)
+  the [Terraform Plugin Framework](https://github.com/hashicorp/terraform-plugin-framework)
   and [Terraform Provider Development Guide](https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-provider).
