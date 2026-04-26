@@ -1,6 +1,15 @@
-## 1.3.2 (unreleased)
+## 1.3.3 (unreleased)
+
+## 1.3.2 (2026-04-26)
+
+BUG FIXES:
+
+- resource/porkbun_dns_record: Fix handling of records with `prio=null`.
+- resource/porkbun_dnssec_record: Fix algorithm assignment in DNSSEC key data model.
 
 ## 1.3.1 (2025-08-03)
+
+BUG FIXES:
 
 - resource/porkbun_dnssec_record: Fix handling of deleted records when reading state.
 - resource/porkbun_url_forward: Fix handling of deleted records when reading state.
