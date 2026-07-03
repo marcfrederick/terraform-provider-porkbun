@@ -3,26 +3,20 @@ updates:
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
-      terraform:
+      go-dependencies:
         patterns:
-          - "github.com/hashicorp/terraform-*"
-    cooldown:
-      default-days: 7
-  - package-ecosystem: "gomod"
-    directory: "/tools"
-    schedule:
-      interval: "weekly"
+          - "*"
     cooldown:
       default-days: 7
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
-      actions:
+      actions-dependencies:
         patterns:
-          - "actions/*"
+          - "*"
     cooldown:
       default-days: 7
