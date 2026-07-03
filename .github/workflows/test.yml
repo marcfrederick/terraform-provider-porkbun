@@ -72,13 +72,13 @@ jobs:
       matrix:
         include:
           - engine: terraform
-            version: '1.13.*'
-          - engine: terraform
             version: '1.14.*'
-          - engine: opentofu
-            version: '1.10.*'
+          - engine: terraform
+            version: '1.15.*'
           - engine: opentofu
             version: '1.11.*'
+          - engine: opentofu
+            version: '1.12.*'
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -116,13 +116,13 @@ jobs:
       matrix:
         include:
           - engine: terraform
-            version: '1.13.*'
-          - engine: terraform
             version: '1.14.*'
-          - engine: opentofu
-            version: '1.10.*'
+          - engine: terraform
+            version: '1.15.*'
           - engine: opentofu
             version: '1.11.*'
+          - engine: opentofu
+            version: '1.12.*'
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
