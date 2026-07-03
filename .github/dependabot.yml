@@ -8,10 +8,14 @@ updates:
       terraform:
         patterns:
           - "github.com/hashicorp/terraform-*"
+    cooldown:
+      default-days: 7
   - package-ecosystem: "gomod"
     directory: "/tools"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -20,3 +24,5 @@ updates:
       actions:
         patterns:
           - "actions/*"
+    cooldown:
+      default-days: 7
