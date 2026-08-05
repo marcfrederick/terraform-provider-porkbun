@@ -102,11 +102,15 @@ func (d *DomainDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 
-	domain, err := d.findDomain(ctx, data.Domain.ValueString())
+	apiResp, err := d.client.Domains.GetDomain(ctx, data.Domain.ValueString(), &porkbun.GetDomainOptions{
+		IncludeLabels: porkbun.Yes,
+	})
 	if err != nil {
 		resp.Diagnostics.AddError("Domain Not Found", fmt.Sprintf("Unable to find domain %s: %s", data.Domain.ValueString(), err))
 		return
 	}
+
+	domain := &apiResp.Domain
 
 	data.Domain = types.StringValue(domain.Domain)
 	data.Status = types.StringValue(domain.Status)
@@ -122,22 +126,6 @@ func (d *DomainDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-// findDomain retrieves the domain information from the Porkbun API.
-func (d *DomainDataSource) findDomain(ctx context.Context, domainName string) (*porkbun.Domain, error) {
-	domains, err := listDomains(ctx, d.client)
-	if err != nil {
-		return nil, fmt.Errorf("error paginating domains: %w", err)
-	}
-
-	for _, domain := range domains {
-		if domain.Domain == domainName {
-			return &domain, nil
-		}
-	}
-
-	return nil, fmt.Errorf("domain %s not found", domainName)
 }
 
 // convertDomainLabelToObjectValue converts a porkbun.Label to a types.ObjectValue.
