@@ -116,7 +116,7 @@ func (r *URLForwardResource) Create(ctx context.Context, req resource.CreateRequ
 
 	id, err := r.createURLForward(ctx, &data)
 	if err != nil {
-		resp.Diagnostics.AddError("Error Creating URL Forward", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Creating URL Forward", err)
 		return
 	}
 	data.ID = types.StringValue(id)
@@ -133,7 +133,7 @@ func (r *URLForwardResource) Read(ctx context.Context, req resource.ReadRequest,
 
 	forward, ok, err := r.readURLForward(ctx, data.Domain.ValueString(), data.Subdomain.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Error Reading URL Forward", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Reading URL Forward", err)
 		return
 	}
 	if !ok {
@@ -163,13 +163,13 @@ func (r *URLForwardResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	if _, err := r.client.Domains.DeleteURLForward(ctx, data.Domain.ValueString(), data.ID.ValueString()); err != nil {
-		resp.Diagnostics.AddError("Error Deleting URL Forward for Update", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Deleting URL Forward for Update", err)
 		return
 	}
 
 	id, err := r.createURLForward(ctx, &data)
 	if err != nil {
-		resp.Diagnostics.AddError("Error Creating URL Forward", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Creating URL Forward", err)
 		return
 	}
 	data.ID = types.StringValue(id)
@@ -185,7 +185,7 @@ func (r *URLForwardResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	if _, err := r.client.Domains.DeleteURLForward(ctx, data.Domain.ValueString(), data.ID.ValueString()); err != nil {
-		resp.Diagnostics.AddError("Error Deleting URL Forward", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Deleting URL Forward", err)
 	}
 }
 

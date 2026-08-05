@@ -224,7 +224,7 @@ func (r *DNSSECRecordResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	if _, err := r.client.DNS.CreateDNSSECRecord(ctx, data.Domain.ValueString(), &dnssecRecord); err != nil {
-		resp.Diagnostics.AddError("Error Creating DNSSEC", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Creating DNSSEC", err)
 		return
 	}
 
@@ -242,7 +242,7 @@ func (r *DNSSECRecordResource) Read(ctx context.Context, req resource.ReadReques
 	//        out how the Porkbun API handles this and update the code accordingly.
 	dnssecRecord, ok, err := r.readDNSSECRecord(ctx, data.Domain.ValueString(), data.DSData.KeyTag.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Error Reading DNSSEC", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Reading DNSSEC", err)
 		return
 	}
 	if !ok {
@@ -303,7 +303,7 @@ func (r *DNSSECRecordResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	if _, err := r.client.DNS.DeleteDNSSECRecord(ctx, data.Domain.ValueString(), data.DSData.KeyTag.ValueString()); err != nil {
-		resp.Diagnostics.AddError("Error Deleting DNSSEC", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Deleting DNSSEC", err)
 		return
 	}
 }

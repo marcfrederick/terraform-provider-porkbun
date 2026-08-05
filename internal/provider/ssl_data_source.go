@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -75,7 +74,7 @@ func (d *SSLDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 
 	sslResp, err := d.client.SSL.Retrieve(ctx, data.Domain.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to retrieve SSL data: %s", err))
+		addAPIDiagnostics(&resp.Diagnostics, "Unable to retrieve SSL data", err)
 		return
 	}
 

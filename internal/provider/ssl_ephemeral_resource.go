@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/ephemeral"
 	"github.com/hashicorp/terraform-plugin-framework/ephemeral/schema"
@@ -73,7 +72,7 @@ func (r *SSLEphemeralResource) Open(ctx context.Context, req ephemeral.OpenReque
 
 	sslResp, err := r.client.SSL.Retrieve(ctx, data.Domain.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to retrieve SSL data: %s", err))
+		addAPIDiagnostics(&resp.Diagnostics, "Unable to retrieve SSL data", err)
 		return
 	}
 

@@ -143,7 +143,7 @@ func (r *DNSRecordResource) Create(ctx context.Context, req resource.CreateReque
 
 	apiResp, err := r.client.DNS.CreateRecord(ctx, data.Domain.ValueString(), &record)
 	if err != nil {
-		resp.Diagnostics.AddError("Error Creating DNS Record", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Creating DNS Record", err)
 		return
 	}
 
@@ -166,7 +166,7 @@ func (r *DNSRecordResource) Read(ctx context.Context, req resource.ReadRequest, 
 
 	record, ok, err := r.getDNSRecord(ctx, data.Domain.ValueString(), data.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError("Error Fetching DNS Record", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Fetching DNS Record", err)
 		return
 	}
 	if !ok {
@@ -203,13 +203,13 @@ func (r *DNSRecordResource) Update(ctx context.Context, req resource.UpdateReque
 
 	_, err := r.client.DNS.EditRecord(ctx, data.Domain.ValueString(), data.ID.ValueInt64(), &porkbun.EditRecord{
 		Name:    data.Subdomain.ValueString(),
-		Type:    porkbun.DNSRecordType(data.Type.ValueString()), // guaranteed to be valid by schema validation
+		Type:    porkbun.DNSRecordType(data.Type.ValueString()),
 		Content: data.Content.ValueString(),
 		TTL:     data.TTL.ValueInt64(),
 		Prio:    data.Prio.ValueInt64(),
 	})
 	if err != nil {
-		resp.Diagnostics.AddError("Error Updating DNS Record", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Updating DNS Record", err)
 		return
 	}
 
@@ -224,7 +224,7 @@ func (r *DNSRecordResource) Delete(ctx context.Context, req resource.DeleteReque
 	}
 
 	if _, err := r.client.DNS.DeleteRecord(ctx, data.Domain.ValueString(), data.ID.ValueInt64()); err != nil {
-		resp.Diagnostics.AddError("Error Deleting DNS Record", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Deleting DNS Record", err)
 		return
 	}
 }

@@ -106,7 +106,7 @@ func (d *DomainDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		IncludeLabels: porkbun.Yes,
 	})
 	if err != nil {
-		resp.Diagnostics.AddError("Domain Not Found", fmt.Sprintf("Unable to find domain %s: %s", data.Domain.ValueString(), err))
+		addAPIDiagnostics(&resp.Diagnostics, fmt.Sprintf("Unable to find domain %s", data.Domain.ValueString()), err)
 		return
 	}
 

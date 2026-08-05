@@ -84,7 +84,7 @@ func (d *DomainsDataSource) Read(ctx context.Context, req datasource.ReadRequest
 
 	domains, err := listDomains(ctx, d.client)
 	if err != nil {
-		resp.Diagnostics.AddError("Error Listing Domains", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Listing Domains", err)
 		return
 	}
 
