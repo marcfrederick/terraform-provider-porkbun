@@ -78,38 +78,38 @@ func TestEnumValidator_ValidateInt64(t *testing.T) {
 
 	type testCase struct {
 		in          types.Int64
-		enumValues  []porkbun.DnssecAlgorithm
+		enumValues  []porkbun.DNSSECAlgorithm
 		expectError bool
 	}
 
 	testCases := map[string]testCase{
 		"simple-match": {
 			in: types.Int64Value(1),
-			enumValues: []porkbun.DnssecAlgorithm{
-				porkbun.DnssecAlgorithmRsaMd5,
-				porkbun.DnssecAlgorithmDsaSha1,
+			enumValues: []porkbun.DNSSECAlgorithm{
+				porkbun.DNSSECAlgorithmRSAMD5,
+				porkbun.DNSSECAlgorithmDSASHA1,
 			},
 		},
 		"simple-mismatch": {
 			in: types.Int64Value(100),
-			enumValues: []porkbun.DnssecAlgorithm{
-				porkbun.DnssecAlgorithmRsaMd5,
-				porkbun.DnssecAlgorithmDsaSha1,
+			enumValues: []porkbun.DNSSECAlgorithm{
+				porkbun.DNSSECAlgorithmRSAMD5,
+				porkbun.DNSSECAlgorithmDSASHA1,
 			},
 			expectError: true,
 		},
 		"skip-validation-on-null": {
 			in: types.Int64Null(),
-			enumValues: []porkbun.DnssecAlgorithm{
-				porkbun.DnssecAlgorithmRsaMd5,
-				porkbun.DnssecAlgorithmDsaSha1,
+			enumValues: []porkbun.DNSSECAlgorithm{
+				porkbun.DNSSECAlgorithmRSAMD5,
+				porkbun.DNSSECAlgorithmDSASHA1,
 			},
 		},
 		"skip-validation-on-unknown": {
 			in: types.Int64Unknown(),
-			enumValues: []porkbun.DnssecAlgorithm{
-				porkbun.DnssecAlgorithmRsaMd5,
-				porkbun.DnssecAlgorithmDsaSha1,
+			enumValues: []porkbun.DNSSECAlgorithm{
+				porkbun.DNSSECAlgorithmRSAMD5,
+				porkbun.DNSSECAlgorithmDSASHA1,
 			},
 		},
 	}

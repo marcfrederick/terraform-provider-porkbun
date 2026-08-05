@@ -133,21 +133,21 @@ func (r *DNSRecordResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	record := porkbun.DnsRecord{
+	record := porkbun.DNSRecord{
 		Name:    data.Subdomain.ValueString(),
-		Type:    porkbun.DnsRecordType(data.Type.ValueString()), // guaranteed to be valid by schema validation
+		Type:    porkbun.DNSRecordType(data.Type.ValueString()), // guaranteed to be valid by schema validation
 		Content: data.Content.ValueString(),
-		TTL:     strconv.FormatInt(data.TTL.ValueInt64(), 10),
-		Prio:    strconv.FormatInt(data.Prio.ValueInt64(), 10),
+		TTL:     porkbun.FlexInt64(data.TTL.ValueInt64()),
+		Prio:    porkbun.FlexInt64(data.Prio.ValueInt64()),
 	}
 
-	apiResp, err := r.client.Dns.CreateRecord(ctx, data.Domain.ValueString(), &record)
+	apiResp, err := r.client.DNS.CreateRecord(ctx, data.Domain.ValueString(), &record)
 	if err != nil {
 		resp.Diagnostics.AddError("Error Creating DNS Record", err.Error())
 		return
 	}
 
-	data.ID = types.Int64Value(apiResp.ID)
+	data.ID = types.Int64Value(apiResp.ID.Int64())
 	data.Notes = types.StringValue("") // empty on create
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -180,13 +180,13 @@ func (r *DNSRecordResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	data.ID = types.Int64PointerValue(record.ID)
+	data.ID = types.Int64Value(record.ID.Int64())
 	data.Subdomain = types.StringValue(subdomain)
 	data.Type = types.StringValue(string(record.Type))
 	data.Content = types.StringValue(record.Content)
 	data.Notes = types.StringValue(record.Notes)
-	data.TTL = util.Int64Value(record.TTL, &resp.Diagnostics)
-	data.Prio = util.Int64Value(record.Prio, &resp.Diagnostics)
+	data.TTL = types.Int64Value(record.TTL.Int64())
+	data.Prio = types.Int64Value(record.Prio.Int64())
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -201,12 +201,12 @@ func (r *DNSRecordResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	_, err := r.client.Dns.EditRecord(ctx, data.Domain.ValueString(), data.ID.ValueInt64(), &porkbun.EditRecord{
+	_, err := r.client.DNS.EditRecord(ctx, data.Domain.ValueString(), data.ID.ValueInt64(), &porkbun.EditRecord{
 		Name:    data.Subdomain.ValueString(),
-		Type:    porkbun.DnsRecordType(data.Type.ValueString()), // guaranteed to be valid by schema validation
+		Type:    porkbun.DNSRecordType(data.Type.ValueString()), // guaranteed to be valid by schema validation
 		Content: data.Content.ValueString(),
-		TTL:     strconv.FormatInt(data.TTL.ValueInt64(), 10),
-		Prio:    strconv.FormatInt(data.Prio.ValueInt64(), 10),
+		TTL:     data.TTL.ValueInt64(),
+		Prio:    data.Prio.ValueInt64(),
 	})
 	if err != nil {
 		resp.Diagnostics.AddError("Error Updating DNS Record", err.Error())
@@ -223,7 +223,7 @@ func (r *DNSRecordResource) Delete(ctx context.Context, req resource.DeleteReque
 		return
 	}
 
-	if _, err := r.client.Dns.DeleteRecord(ctx, data.Domain.ValueString(), data.ID.ValueInt64()); err != nil {
+	if _, err := r.client.DNS.DeleteRecord(ctx, data.Domain.ValueString(), data.ID.ValueInt64()); err != nil {
 		resp.Diagnostics.AddError("Error Deleting DNS Record", err.Error())
 		return
 	}
@@ -256,8 +256,8 @@ func (r *DNSRecordResource) ImportState(ctx context.Context, req resource.Import
 }
 
 // getDNSRecord fetches the DNS record from Porkbun using the domain and record ID.
-func (r *DNSRecordResource) getDNSRecord(ctx context.Context, domain string, id int64) (*porkbun.DnsRecord, bool, error) {
-	apiResp, err := r.client.Dns.GetRecords(ctx, domain, &id)
+func (r *DNSRecordResource) getDNSRecord(ctx context.Context, domain string, id int64) (*porkbun.DNSRecord, bool, error) {
+	apiResp, err := r.client.DNS.GetRecord(ctx, domain, id)
 	if err != nil {
 		return nil, false, fmt.Errorf("error fetching DNS record: %w", err)
 	}

@@ -97,17 +97,17 @@ func (r *DNSSECRecordResource) Schema(ctx context.Context, req resource.SchemaRe
 						MarkdownDescription: "DNSSEC algorithm identifier, as defined in RFC 8624.",
 						Validators: []validator.Int64{
 							enumvalidator.Valid(
-								porkbun.DnssecAlgorithmRsaMd5,
-								porkbun.DnssecAlgorithmDsaSha1,
-								porkbun.DnssecAlgorithmRsaSha1,
-								porkbun.DnssecAlgorithmDsaNsec3Sha1,
-								porkbun.DnssecAlgorithmRsaSha256,
-								porkbun.DnssecAlgorithmRsaSha512,
-								porkbun.DnssecAlgorithmGostR34111994,
-								porkbun.DnssecAlgorithmEcdsaSha256,
-								porkbun.DnssecAlgorithmEcdsaSha384,
-								porkbun.DnssecAlgorithmEd25519,
-								porkbun.DnssecAlgorithmEd448,
+								porkbun.DNSSECAlgorithmRSAMD5,
+								porkbun.DNSSECAlgorithmDSASHA1,
+								porkbun.DNSSECAlgorithmRSASHA1,
+								porkbun.DNSSECAlgorithmDSANSEC3SHA1,
+								porkbun.DNSSECAlgorithmRSASHA256,
+								porkbun.DNSSECAlgorithmRSASHA512,
+								porkbun.DNSSECAlgorithmECCGOST,
+								porkbun.DNSSECAlgorithmECDSAP256SHA256,
+								porkbun.DNSSECAlgorithmECDSAP384SHA384,
+								porkbun.DNSSECAlgorithmED25519,
+								porkbun.DNSSECAlgorithmED448,
 							),
 						},
 					},
@@ -116,10 +116,10 @@ func (r *DNSSECRecordResource) Schema(ctx context.Context, req resource.SchemaRe
 						MarkdownDescription: "Hash algorithm identifier used to create the DS digest.",
 						Validators: []validator.Int64{
 							enumvalidator.Valid(
-								porkbun.DnssecDigestTypeSha1,
-								porkbun.DnssecDigestTypeSha256,
-								porkbun.DnssecDigestTypeGostR34111994,
-								porkbun.DnssecDigestTypeSha384,
+								porkbun.DNSSECDigestTypeSHA1,
+								porkbun.DNSSECDigestTypeSHA256,
+								porkbun.DNSSECDigestTypeGOSTR341194,
+								porkbun.DNSSECDigestTypeSHA384,
 							),
 						},
 					},
@@ -158,17 +158,17 @@ func (r *DNSSECRecordResource) Schema(ctx context.Context, req resource.SchemaRe
 						MarkdownDescription: "DNSSEC algorithm identifier, as defined in RFC 8624.",
 						Validators: []validator.Int64{
 							enumvalidator.Valid(
-								porkbun.DnssecAlgorithmRsaMd5,
-								porkbun.DnssecAlgorithmDsaSha1,
-								porkbun.DnssecAlgorithmRsaSha1,
-								porkbun.DnssecAlgorithmDsaNsec3Sha1,
-								porkbun.DnssecAlgorithmRsaSha256,
-								porkbun.DnssecAlgorithmRsaSha512,
-								porkbun.DnssecAlgorithmGostR34111994,
-								porkbun.DnssecAlgorithmEcdsaSha256,
-								porkbun.DnssecAlgorithmEcdsaSha384,
-								porkbun.DnssecAlgorithmEd25519,
-								porkbun.DnssecAlgorithmEd448,
+								porkbun.DNSSECAlgorithmRSAMD5,
+								porkbun.DNSSECAlgorithmDSASHA1,
+								porkbun.DNSSECAlgorithmRSASHA1,
+								porkbun.DNSSECAlgorithmDSANSEC3SHA1,
+								porkbun.DNSSECAlgorithmRSASHA256,
+								porkbun.DNSSECAlgorithmRSASHA512,
+								porkbun.DNSSECAlgorithmECCGOST,
+								porkbun.DNSSECAlgorithmECDSAP256SHA256,
+								porkbun.DNSSECAlgorithmECDSAP384SHA384,
+								porkbun.DNSSECAlgorithmED25519,
+								porkbun.DNSSECAlgorithmED448,
 							),
 						},
 					},
@@ -202,28 +202,28 @@ func (r *DNSSECRecordResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	dnssecRecord := porkbun.DnssecRecordData{
-		MaxSigLife: strconv.FormatInt(data.MaxSigLife.ValueInt64(), 10),
-	}
+	dnssecRecord := porkbun.DNSSECRecord{}
+	maxSigLife := strconv.FormatInt(data.MaxSigLife.ValueInt64(), 10)
+	dnssecRecord.MaxSigLife = &maxSigLife
 
 	if data.DSData != nil {
 		dnssecRecord.KeyTag = data.DSData.KeyTag.ValueString()
-		dnssecRecord.Alg = porkbun.DnssecAlgorithm(strconv.FormatInt(data.DSData.Algorithm.ValueInt64(), 10))
-		dnssecRecord.DigestType = porkbun.DnssecDigestType(strconv.FormatInt(data.DSData.DigestType.ValueInt64(), 10))
+		dnssecRecord.Alg = porkbun.DNSSECAlgorithm(strconv.FormatInt(data.DSData.Algorithm.ValueInt64(), 10))
+		dnssecRecord.DigestType = porkbun.DNSSECDigestType(strconv.FormatInt(data.DSData.DigestType.ValueInt64(), 10))
 		dnssecRecord.Digest = data.DSData.Digest.ValueString()
 	}
 
 	if data.KeyData != nil {
 		flags := strconv.FormatInt(data.KeyData.Flags.ValueInt64(), 10)
 		protocol := strconv.FormatInt(data.KeyData.Protocol.ValueInt64(), 10)
-		algorithm := porkbun.DnssecAlgorithm(strconv.FormatInt(data.KeyData.Algorithm.ValueInt64(), 10))
+		algorithm := porkbun.DNSSECAlgorithm(strconv.FormatInt(data.KeyData.Algorithm.ValueInt64(), 10))
 		dnssecRecord.KeyDataFlags = &flags
 		dnssecRecord.KeyDataProtocol = &protocol
 		dnssecRecord.KeyDataAlgo = &algorithm
 		dnssecRecord.KeyDataPubKey = data.KeyData.PublicKey.ValueStringPointer()
 	}
 
-	if _, err := r.client.Dns.CreateDnssecRecord(ctx, data.Domain.ValueString(), &dnssecRecord); err != nil {
+	if _, err := r.client.DNS.CreateDNSSECRecord(ctx, data.Domain.ValueString(), &dnssecRecord); err != nil {
 		resp.Diagnostics.AddError("Error Creating DNSSEC", err.Error())
 		return
 	}
@@ -302,7 +302,7 @@ func (r *DNSSECRecordResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
-	if _, err := r.client.Dns.DeleteDnssecRecord(ctx, data.Domain.ValueString(), data.DSData.KeyTag.ValueString()); err != nil {
+	if _, err := r.client.DNS.DeleteDNSSECRecord(ctx, data.Domain.ValueString(), data.DSData.KeyTag.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error Deleting DNSSEC", err.Error())
 		return
 	}
@@ -325,8 +325,8 @@ func (r *DNSSECRecordResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 // readDNSSECRecord retrieves the DNSSEC record for the specified domain and key tag.
-func (r *DNSSECRecordResource) readDNSSECRecord(ctx context.Context, domain, keyTag string) (*porkbun.DnssecRecordData, bool, error) {
-	resp, err := r.client.Dns.GetDnssecRecords(ctx, domain)
+func (r *DNSSECRecordResource) readDNSSECRecord(ctx context.Context, domain, keyTag string) (*porkbun.DNSSECRecord, bool, error) {
+	resp, err := r.client.DNS.GetDNSSECRecords(ctx, domain)
 	if err != nil {
 		return nil, false, fmt.Errorf("error getting DNSSEC records: %w", err)
 	}

@@ -71,7 +71,7 @@ func (r *DomainNameserversResource) Create(ctx context.Context, req resource.Cre
 		return
 	}
 
-	if _, err := r.client.Domains.UpdateNameServers(ctx, data.Domain.ValueString(), &nameservers); err != nil {
+	if _, err := r.client.Domains.UpdateNameServers(ctx, data.Domain.ValueString(), nameservers); err != nil {
 		resp.Diagnostics.AddError("Error Setting Nameservers", err.Error())
 		return
 	}
@@ -110,7 +110,7 @@ func (r *DomainNameserversResource) Update(ctx context.Context, req resource.Upd
 		return
 	}
 
-	if _, err := r.client.Domains.UpdateNameServers(ctx, data.Domain.ValueString(), &nameservers); err != nil {
+	if _, err := r.client.Domains.UpdateNameServers(ctx, data.Domain.ValueString(), nameservers); err != nil {
 		resp.Diagnostics.AddError("Error Updating Nameservers", err.Error())
 		return
 	}
@@ -120,15 +120,8 @@ func (r *DomainNameserversResource) Update(ctx context.Context, req resource.Upd
 }
 
 func (r *DomainNameserversResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var data DomainNameserversResourceModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	if _, err := r.client.Domains.UpdateNameServers(ctx, data.Domain.ValueString(), &porkbun.NameServers{}); err != nil {
-		resp.Diagnostics.AddError("Error Deleting Nameservers", err.Error())
-	}
+	// Nameservers cannot be removed from a domain; the Porkbun API requires
+	// at least one. Removing the resource from state stops managing them.
 }
 
 func (r *DomainNameserversResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
