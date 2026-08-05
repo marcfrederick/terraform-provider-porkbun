@@ -116,7 +116,7 @@ func (r *URLForwardResource) Create(ctx context.Context, req resource.CreateRequ
 
 	id, err := r.createURLForward(ctx, &data)
 	if err != nil {
-		resp.Diagnostics.AddError("Error Creating URL Forward", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Creating URL Forward", err)
 		return
 	}
 	data.ID = types.StringValue(id)
@@ -133,7 +133,7 @@ func (r *URLForwardResource) Read(ctx context.Context, req resource.ReadRequest,
 
 	forward, ok, err := r.readURLForward(ctx, data.Domain.ValueString(), data.Subdomain.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Error Reading URL Forward", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Reading URL Forward", err)
 		return
 	}
 	if !ok {
@@ -141,12 +141,12 @@ func (r *URLForwardResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
-	data.ID = types.StringValue(forward.Id)
+	data.ID = types.StringValue(forward.ID)
 	data.Subdomain = types.StringValue(forward.Subdomain)
 	data.Location = types.StringValue(forward.Location)
 	data.Type = types.StringValue(string(forward.Type))
-	data.IncludePath = util.BoolValue(forward.IncludePath, &resp.Diagnostics)
-	data.Wildcard = util.BoolValue(forward.Wildcard, &resp.Diagnostics)
+	data.IncludePath = util.BoolValue(string(forward.IncludePath), &resp.Diagnostics)
+	data.Wildcard = util.BoolValue(string(forward.Wildcard), &resp.Diagnostics)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -162,14 +162,14 @@ func (r *URLForwardResource) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
-	if _, err := r.client.Domains.DeleteDomainUrlForward(ctx, data.Domain.ValueString(), data.ID.ValueString()); err != nil {
-		resp.Diagnostics.AddError("Error Deleting URL Forward for Update", err.Error())
+	if _, err := r.client.Domains.DeleteURLForward(ctx, data.Domain.ValueString(), data.ID.ValueString()); err != nil {
+		addAPIDiagnostics(&resp.Diagnostics, "Error Deleting URL Forward for Update", err)
 		return
 	}
 
 	id, err := r.createURLForward(ctx, &data)
 	if err != nil {
-		resp.Diagnostics.AddError("Error Creating URL Forward", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Creating URL Forward", err)
 		return
 	}
 	data.ID = types.StringValue(id)
@@ -184,8 +184,8 @@ func (r *URLForwardResource) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
-	if _, err := r.client.Domains.DeleteDomainUrlForward(ctx, data.Domain.ValueString(), data.ID.ValueString()); err != nil {
-		resp.Diagnostics.AddError("Error Deleting URL Forward", err.Error())
+	if _, err := r.client.Domains.DeleteURLForward(ctx, data.Domain.ValueString(), data.ID.ValueString()); err != nil {
+		addAPIDiagnostics(&resp.Diagnostics, "Error Deleting URL Forward", err)
 	}
 }
 
@@ -205,15 +205,15 @@ func (r *URLForwardResource) ImportState(ctx context.Context, req resource.Impor
 
 // createURLForward creates a new URL forward for the specified domain and subdomain.
 func (r *URLForwardResource) createURLForward(ctx context.Context, data *URLForwardResourceModel) (string, error) {
-	opts := porkbun.UrlForward{
+	opts := porkbun.URLForward{
 		Subdomain:   data.Subdomain.ValueString(),
 		Location:    data.Location.ValueString(),
 		Type:        porkbun.ForwardType(data.Type.ValueString()),
-		IncludePath: encodeBool(data.IncludePath.ValueBool()),
-		Wildcard:    encodeBool(data.Wildcard.ValueBool()),
+		IncludePath: porkbun.YesNo(encodeBool(data.IncludePath.ValueBool())),
+		Wildcard:    porkbun.YesNo(encodeBool(data.Wildcard.ValueBool())),
 	}
 
-	if _, err := r.client.Domains.AddDomainUrlForward(ctx, data.Domain.ValueString(), &opts); err != nil {
+	if _, err := r.client.Domains.AddURLForward(ctx, data.Domain.ValueString(), &opts); err != nil {
 		return "", err
 	}
 
@@ -225,12 +225,12 @@ func (r *URLForwardResource) createURLForward(ctx context.Context, data *URLForw
 		return "", fmt.Errorf("URL forward for domain %s and subdomain %s not found after creation", data.Domain.ValueString(), data.Subdomain.ValueString())
 	}
 
-	return forward.Id, nil
+	return forward.ID, nil
 }
 
 // readURLForward retrieves the URL forward for the specified domain and subdomain.
-func (r *URLForwardResource) readURLForward(ctx context.Context, domain, subdomain string) (*porkbun.UrlForwardData, bool, error) {
-	resp, err := r.client.Domains.GetDomainURLForwarding(ctx, domain)
+func (r *URLForwardResource) readURLForward(ctx context.Context, domain, subdomain string) (*porkbun.URLForwardRecord, bool, error) {
+	resp, err := r.client.Domains.ListURLForwards(ctx, domain)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed fetching URL forwards for domain %s: %w", domain, err)
 	}

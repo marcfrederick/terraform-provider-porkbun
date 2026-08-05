@@ -136,10 +136,10 @@ func (p *PorkbunProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	httpClient := p.newRetryableHttpClient(maxRetries)
 	client := porkbun.NewClient(&porkbun.Options{
-		ApiKey:       apiKey,
-		SecretApiKey: secretAPIKey,
+		APIKey:       apiKey,
+		SecretAPIKey: secretAPIKey,
 		IPv4Only:     ipv4Only,
-		HttpClient:   &httpClient,
+		HTTPClient:   httpClient,
 	})
 
 	resp.ResourceData = client

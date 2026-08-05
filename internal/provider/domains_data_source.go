@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -85,7 +84,7 @@ func (d *DomainsDataSource) Read(ctx context.Context, req datasource.ReadRequest
 
 	domains, err := listDomains(ctx, d.client)
 	if err != nil {
-		resp.Diagnostics.AddError("Error Listing Domains", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Listing Domains", err)
 		return
 	}
 
@@ -101,7 +100,7 @@ func (d *DomainsDataSource) Read(ctx context.Context, req datasource.ReadRequest
 func listDomains(ctx context.Context, client *porkbun.Client) ([]porkbun.Domain, error) {
 	start := 0
 	opts := porkbun.DomainListOptions{
-		IncludeLabels: porkbun.String("yes"),
+		IncludeLabels: porkbun.Yes,
 	}
 
 	var result []porkbun.Domain
@@ -110,7 +109,7 @@ func listDomains(ctx context.Context, client *porkbun.Client) ([]porkbun.Domain,
 			return nil, fmt.Errorf("context error: %w", ctx.Err())
 		}
 
-		opts.Start = porkbun.String(strconv.Itoa(start))
+		opts.Start = porkbun.Ptr(int64(start))
 
 		resp, err := client.Domains.ListDomains(ctx, &opts)
 		if err != nil {

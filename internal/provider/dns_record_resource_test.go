@@ -99,7 +99,7 @@ func TestAccDNSRecordResource(t *testing.T) {
 	})
 }
 
-func testAccDNSRecordResourceConfig(subdomain, content string, recordType porkbun.DnsRecordType, ttl, prio int) string {
+func testAccDNSRecordResourceConfig(subdomain, content string, recordType porkbun.DNSRecordType, ttl, prio int) string {
 	return fmt.Sprintf(`
 resource "porkbun_dns_record" "test" {
   domain    = %[1]q

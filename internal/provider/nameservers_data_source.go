@@ -66,7 +66,7 @@ func (d *DomainNameserversDataSource) Read(ctx context.Context, req datasource.R
 
 	nsResp, err := d.client.Domains.GetNameServers(ctx, data.Domain.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Error Reading Nameservers", err.Error())
+		addAPIDiagnostics(&resp.Diagnostics, "Error Reading Nameservers", err)
 		return
 	}
 
